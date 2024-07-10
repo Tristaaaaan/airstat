@@ -1,4 +1,4 @@
-import 'package:airstat/app.dart';
+import 'package:airstat/main/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,7 +16,7 @@ class MainApp extends StatelessWidget {
       DeviceOrientation.landscapeRight,
     ]);
     return const MaterialApp(
-      home: App(flavor: "Development"),
+      home: Home(),
     );
   }
 }
