@@ -8,7 +8,7 @@
 PRODUCT_NAME = airstat
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.airstat
+PRODUCT_BUNDLE_IDENTIFIER = com.tristans.airstat
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2024 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2024 com.tristans. All rights reserved.
