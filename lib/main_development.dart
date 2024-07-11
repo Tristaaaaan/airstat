@@ -1,9 +1,11 @@
 import 'package:airstat/main/homepage.dart';
+import 'package:airstat/themes/lightmode/light_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -15,8 +17,9 @@ class MainApp extends StatelessWidget {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return const MaterialApp(
-      home: Home(),
+    return MaterialApp(
+      theme: lightMode,
+      home: const Home(),
     );
   }
 }

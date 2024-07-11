@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 class MenuContainer extends StatelessWidget {
   final String image;
   final String label;
+  final void Function()? onTap;
   const MenuContainer({
     super.key,
     required this.image,
     required this.label,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(5),
       child: Center(
         child: IntrinsicHeight(
