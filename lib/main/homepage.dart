@@ -1,5 +1,6 @@
 import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/booth_page.dart';
+import 'package:airstat/main/settings.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -50,9 +51,17 @@ class Home extends StatelessWidget {
                   image: 'assets/icons/Icon_random_orange.png',
                   label: 'Random',
                 ),
-                const MenuContainer(
+                MenuContainer(
                   image: 'assets/icons/Icon_settings_orange.png',
                   label: 'Settings',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Settings(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

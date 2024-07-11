@@ -1,4 +1,5 @@
 import 'package:airstat/main/homepage.dart';
+import 'package:airstat/themes/lightmode/light_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,8 +17,9 @@ class MainApp extends StatelessWidget {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return const MaterialApp(
-      home: Home(),
+    return MaterialApp(
+      theme: lightMode,
+      home: const Home(),
     );
   }
 }
