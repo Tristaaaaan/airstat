@@ -1,4 +1,6 @@
 import 'package:airstat/components/container/settings_container.dart';
+import 'package:airstat/components/container/settings_container_one.dart';
+import 'package:airstat/components/container/settings_container_two.dart';
 import 'package:flutter/material.dart';
 
 class Settings extends StatelessWidget {
@@ -18,6 +20,8 @@ class Settings extends StatelessWidget {
             SettingsContainer(category: "Silhouette / Vents Sampling"),
             SettingsContainer(category: "General Delay"),
             SettingsContainer(category: "Silhouette / Vents Delay"),
+            SettingsContainerTwo(category: "Units"),
+            SettingsContainerOne(category: "Spaces Configuration")
           ],
         ),
       ),

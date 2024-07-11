@@ -6,12 +6,14 @@ class ContainerValues extends StatelessWidget {
   final Color? color;
   final SettingsState state;
   final SettingsNotifier notifier;
+  final double? width;
   const ContainerValues({
     super.key,
     required this.value,
     this.color = Colors.grey,
     required this.state,
     required this.notifier,
+    this.width = 75,
   });
 
   @override
@@ -21,8 +23,8 @@ class ContainerValues extends StatelessWidget {
     return GestureDetector(
       onTap: () => notifier.selectValue(value),
       child: Container(
-        width: 100,
-        padding: const EdgeInsets.all(10),
+        width: width,
+        padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue : Colors.greenAccent,
         ),

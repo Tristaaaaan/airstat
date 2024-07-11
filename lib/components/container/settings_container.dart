@@ -42,12 +42,35 @@ class SettingsContainer extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              for (var value in ['1', '5', '10', '20'])
-                ContainerValues(
-                  value: value,
-                  state: settingsState,
-                  notifier: settingsNotifier,
-                ),
+              ContainerValues(
+                value: "1",
+                state: settingsState,
+                notifier: settingsNotifier,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              ContainerValues(
+                value: "5",
+                state: settingsState,
+                notifier: settingsNotifier,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              ContainerValues(
+                value: "10",
+                state: settingsState,
+                notifier: settingsNotifier,
+              ),
+              const SizedBox(
+                width: 5,
+              ),
+              ContainerValues(
+                value: "20",
+                state: settingsState,
+                notifier: settingsNotifier,
+              ),
             ],
           )
         ],

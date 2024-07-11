@@ -34,3 +34,6 @@ final generalDelayProvider =
 final silhouetteDelayProvider =
     StateNotifierProvider<SettingsNotifier, SettingsState>(
         (ref) => SettingsNotifier());
+
+final unitsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>(
+    (ref) => SettingsNotifier());
