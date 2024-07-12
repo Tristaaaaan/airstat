@@ -2,10 +2,9 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/main/booth_page.dart';
-import 'package:airstat/main/try.dart';
-import 'package:airstat/permission/permission_handlers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -64,20 +63,32 @@ class Settings extends ConsumerWidget {
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () async {
-                final status = await checkPermissionStatus();
-                if (!status) {
-                  requestPermissions();
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const HomePage(),
-                    ),
-                  );
-                  // List<String>? serialList =
-                  //     await serialComm.getAvailablePorts();
+                // final status = await checkPermissionStatus();
+                // if (!status) {
+                //   requestPermissions();
+                // } else {
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => const HomePage(),
+                //     ),
+                //   );
+                List<String>? serialList = await serialComm.getAvailablePorts();
 
-                  // print("Serial List: $serialList");
+                if (serialList!.isEmpty) {
+                  print("Serial List: $serialList");
+                  print("Serial List is empty");
+                  if (context.mounted) {
+                    informationSnackBar(
+                        context, Icons.error, "There is no available ports");
+                  } else {
+                    print("Serial List: $serialList");
+                    print("Serial List is empty");
+                    if (context.mounted) {
+                      informationSnackBar(
+                          context, Icons.check, "There are available ports");
+                    }
+                  }
                 }
               },
             ),
