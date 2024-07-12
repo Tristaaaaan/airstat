@@ -2,21 +2,21 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_serial/flutter_serial.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:serial_communication/serial_communication.dart';
 
 // State for log data and received data
 final logDataProvider = StateProvider<String>((ref) => "");
 final receivedDataProvider = StateProvider<String>((ref) => "");
 final selectedPortProvider = StateProvider<String>((ref) => "Selected Port");
 final selectedBaudRateProvider =
-    StateProvider<int>((ref) => SerialCommunication().baudRateList.first);
+    StateProvider<int>((ref) => FlutterSerial().baudRateList.first);
 final serialListProvider = StateProvider<List<String>>((ref) => []);
 
 final formatProvider = StateProvider<DataFormat>((ref) => DataFormat.ASCII);
 final messageProvider = StateProvider<String>((ref) => "");
 final serialCommunicationProvider =
-    Provider<SerialCommunication>((ref) => SerialCommunication());
+    Provider<FlutterSerial>((ref) => FlutterSerial());
 
 class Booth extends HookConsumerWidget {
   const Booth({super.key});

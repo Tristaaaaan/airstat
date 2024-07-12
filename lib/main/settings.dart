@@ -1,13 +1,25 @@
+import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
+import 'package:airstat/components/textfield/regular_textfield.dart';
+import 'package:airstat/main/booth_page.dart';
+import 'package:airstat/main/try.dart';
+import 'package:airstat/permission/permission_handlers.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Settings extends StatelessWidget {
-  const Settings({super.key});
+class Settings extends ConsumerWidget {
+  const Settings({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final serialComm = ref.watch(serialCommunicationProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -21,7 +33,54 @@ class Settings extends StatelessWidget {
             SettingsContainer(category: "General Delay"),
             SettingsContainer(category: "Silhouette / Vents Delay"),
             SettingsContainerTwo(category: "Units"),
-            SettingsContainerOne(category: "Spaces Configuration")
+            SettingsContainerOne(category: "Spaces Configuration"),
+            RegularTextField(
+              category: "User / Test ID",
+              hinttext: "username",
+            ),
+            RegularTextField(
+              category: "Cloud Folder",
+              hinttext: "folder name",
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 5,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(
+              Icons.settings,
+              size: 50,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            RegularButton(
+              buttonText: "Save",
+              textColor: Theme.of(context).colorScheme.background,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              width: 100,
+              onTap: () async {
+                final status = await checkPermissionStatus();
+                if (!status) {
+                  requestPermissions();
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
+                  // List<String>? serialList =
+                  //     await serialComm.getAvailablePorts();
+
+                  // print("Serial List: $serialList");
+                }
+              },
+            ),
           ],
         ),
       ),

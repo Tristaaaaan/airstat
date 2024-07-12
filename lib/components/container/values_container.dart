@@ -10,7 +10,7 @@ class ContainerValues extends StatelessWidget {
   const ContainerValues({
     super.key,
     required this.value,
-    this.color = Colors.grey,
+    this.color,
     required this.state,
     required this.notifier,
     this.width = 75,
@@ -19,19 +19,24 @@ class ContainerValues extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSelected = state.selectedValue == value;
-    print("isSelected: $isSelected");
+
     return GestureDetector(
       onTap: () => notifier.selectValue(value),
       child: Container(
         width: width,
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.greenAccent,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.secondary,
         ),
         child: Text(
           value,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20),
+          style: TextStyle(
+            fontSize: 20,
+            color: Theme.of(context).colorScheme.background,
+          ),
         ),
       ),
     );
