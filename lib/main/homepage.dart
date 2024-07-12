@@ -1,6 +1,7 @@
 import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/file_page.dart';
 import 'package:airstat/main/settings.dart';
+import 'package:airstat/main/three_d_page.dart';
 import 'package:airstat/main/try.dart';
 import 'package:flutter/material.dart';
 
@@ -31,9 +32,16 @@ class Home extends StatelessWidget {
                       );
                     },
                   ),
-                  const MenuContainer(
+                  MenuContainer(
                     image: 'assets/icons/Icon3dMap.png',
                     label: '3D Map',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ThreeDMap()),
+                      );
+                    },
                   ),
                   const MenuContainer(
                     image: 'assets/icons/Icon_continuous_orange.png',
