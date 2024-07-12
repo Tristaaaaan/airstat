@@ -1,7 +1,7 @@
 import 'package:airstat/components/container/menu_container.dart';
-import 'package:airstat/main/booth_page.dart';
 import 'package:airstat/main/file_page.dart';
 import 'package:airstat/main/settings.dart';
+import 'package:airstat/main/try.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -26,7 +26,8 @@ class Home extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Booth()),
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
                       );
                     },
                   ),

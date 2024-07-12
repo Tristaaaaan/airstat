@@ -3,13 +3,23 @@ import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
+import 'package:airstat/main/booth_page.dart';
+import 'package:airstat/main/try.dart';
+import 'package:airstat/permission/permission_handlers.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Settings extends StatelessWidget {
-  const Settings({super.key});
+class Settings extends ConsumerWidget {
+  const Settings({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
+    final serialComm = ref.watch(serialCommunicationProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -53,7 +63,23 @@ class Settings extends StatelessWidget {
               textColor: Theme.of(context).colorScheme.background,
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
-              onTap: () {},
+              onTap: () async {
+                final status = await checkPermissionStatus();
+                if (!status) {
+                  requestPermissions();
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  );
+                  // List<String>? serialList =
+                  //     await serialComm.getAvailablePorts();
+
+                  // print("Serial List: $serialList");
+                }
+              },
             ),
           ],
         ),
