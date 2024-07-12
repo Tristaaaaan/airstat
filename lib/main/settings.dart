@@ -1,3 +1,4 @@
+import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
@@ -47,19 +48,12 @@ class Settings extends StatelessWidget {
               size: 50,
               color: Theme.of(context).colorScheme.primary,
             ),
-            Container(
+            RegularButton(
+              buttonText: "Save",
+              textColor: Theme.of(context).colorScheme.background,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
-              padding: const EdgeInsets.all(5),
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.primary),
-              child: Text(
-                "Save",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Theme.of(context).colorScheme.background,
-                ),
-              ),
+              onTap: () {},
             ),
           ],
         ),
