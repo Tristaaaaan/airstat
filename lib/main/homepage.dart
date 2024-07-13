@@ -2,7 +2,6 @@ import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/file_page.dart';
 import 'package:airstat/main/settings.dart';
 import 'package:airstat/main/three_d_page.dart';
-import 'package:airstat/main/try.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatelessWidget {
@@ -21,16 +20,9 @@ class Home extends StatelessWidget {
                   crossAxisCount: 4,
                 ),
                 children: [
-                  MenuContainer(
+                  const MenuContainer(
                     image: 'assets/icons/Icon_booth_orange.png',
                     label: 'Booth',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomePage()),
-                      );
-                    },
                   ),
                   MenuContainer(
                     image: 'assets/icons/Icon3dMap.png',

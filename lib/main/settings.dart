@@ -4,9 +4,10 @@ import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
-import 'package:airstat/main/booth_page.dart';
+import 'package:airstat/permission/permission_handlers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:usb_serial/usb_serial.dart';
 
 class Settings extends ConsumerWidget {
   const Settings({
@@ -14,11 +15,8 @@ class Settings extends ConsumerWidget {
   });
 
   @override
-  Widget build(
-    BuildContext context,
-    WidgetRef ref,
-  ) {
-    final serialComm = ref.watch(serialCommunicationProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final serialComm = ref.watch(serialCommunicationProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -33,14 +31,8 @@ class Settings extends ConsumerWidget {
             SettingsContainer(category: "Silhouette / Vents Delay"),
             SettingsContainerTwo(category: "Units"),
             SettingsContainerOne(category: "Spaces Configuration"),
-            RegularTextField(
-              category: "User / Test ID",
-              hinttext: "username",
-            ),
-            RegularTextField(
-              category: "Cloud Folder",
-              hinttext: "folder name",
-            ),
+            RegularTextField(category: "User / Test ID", hinttext: "username"),
+            RegularTextField(category: "Cloud Folder", hinttext: "folder name"),
           ],
         ),
       ),
@@ -63,30 +55,27 @@ class Settings extends ConsumerWidget {
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () async {
-                // final status = await checkPermissionStatus();
-                // if (!status) {
-                //   requestPermissions();
-                // } else {
-                //   Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => const HomePage(),
-                //     ),
-                //   );
-                List<String>? serialList = await serialComm.getAvailablePorts();
+                var status = await checkPermission();
 
-                if (serialList!.isEmpty) {
-                  print("Serial List: $serialList");
-                  print("Serial List is empty");
-                  if (context.mounted) {
-                    informationSnackBar(
-                        context, Icons.error, "There is no available ports");
-                  } else {
+                if (!status) {
+                  await requestPermissions();
+                } else {
+                  List<UsbDevice> serialList = await UsbSerial.listDevices();
+                  print(serialList);
+                  print(serialList);
+                  if (serialList.isEmpty) {
                     print("Serial List: $serialList");
                     print("Serial List is empty");
                     if (context.mounted) {
                       informationSnackBar(
-                          context, Icons.check, "There are available ports");
+                          context, Icons.error, "There is no available ports");
+                    }
+                  } else {
+                    print("Serial List: $serialList");
+                    print("Serial List is empty");
+                    if (context.mounted) {
+                      informationSnackBar(context, Icons.check,
+                          "There are available ports. The available ports are: $serialList");
                     }
                   }
                 }

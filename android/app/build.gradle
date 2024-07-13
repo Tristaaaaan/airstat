@@ -65,14 +65,14 @@ android {
     productFlavors {
         production {
             dimension "default"
-            resValue "string", "app_name", "Nylo"
+            resValue "string", "app_name", "Airstat"
             applicationIdSuffix ""
 
         }
 
         development {
             dimension "default"
-            resValue "string", "app_name", "Nylo Development"
+            resValue "string", "app_name", "Airstat Development"
             applicationIdSuffix ".dev"
         }
     }
