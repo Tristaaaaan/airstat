@@ -63,19 +63,12 @@ class _BoothPage extends State<BoothPage> {
         return false;
       }
 
-      _logs.add("Setting DTR and RTS.");
-      await _port!.setDTR(true);
-      await _port!.setRTS(true);
       _logs.add("Setting port parameters.");
       await _port!.setPortParameters(
           9600, // Check the correct baud rate for WindSonic 75
           UsbPort.DATABITS_8,
           UsbPort.STOPBITS_1,
           UsbPort.PARITY_NONE); // Ensure these match your device's settings
-
-      // Set flow control to DSR/DTR
-      _logs.add("Setting flow control to DSR/DTR.");
-      await _port!.setFlowControl(UsbPort.FLOW_CONTROL_DSR_DTR);
 
       _logs.add("Listening to input stream.");
       _subscription = _port!.inputStream!.listen((Uint8List data) {
