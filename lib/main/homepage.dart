@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
             Expanded(
               child: GridView(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 4,
+                  crossAxisCount: 2,
                 ),
                 children: [
                   MenuContainer(

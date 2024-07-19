@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:airstat/components/snackbar/information_snackbar.dart';
@@ -14,160 +15,430 @@ class BoothPage extends StatefulWidget {
 }
 
 class _BoothPage extends State<BoothPage> {
-  UsbPort? _port;
-  String _status = "Idle";
+  UsbPort? port;
+  String status = "Idle";
 
-  final List<String> _serialData = [];
-  final List<UsbDevice> _devices = [];
-  final List<String> _logs = [];
-  StreamSubscription<Uint8List>? _subscription;
-  Transaction<String>? _transaction;
-
-  Future<bool> _connectTo(UsbDevice? device) async {
-    _serialData.clear();
+  final List<Uint8List> serialData = [];
+  final List<UsbDevice> devices = [];
+  final List<String> logs = [];
+  String buffer = '';
+  StreamSubscription<Uint8List>? subscription;
+  Transaction<String>? transaction;
+  bool brunConfigurationMode = false;
+  Future<bool> connectTo(UsbDevice? device) async {
+    serialData.clear();
 
     try {
-      if (_subscription != null) {
-        _logs.add("Cancelling existing subscription.");
-        await _subscription!.cancel();
-        _subscription = null;
+      if (subscription != null) {
+        logs.add("Cancelling existing subscription.");
+        await subscription!.cancel();
+        subscription = null;
       }
 
-      if (_transaction != null) {
-        _logs.add("Disposing existing transaction.");
-        _transaction!.dispose();
-        _transaction = null;
+      if (transaction != null) {
+        logs.add("Disposing existing transaction.");
+        transaction!.dispose();
+        transaction = null;
       }
 
-      if (_port != null) {
-        _logs.add("Closing existing port.");
-        await _port!.close();
-        _port = null;
+      if (port != null) {
+        logs.add("Closing existing port.");
+        await port!.close();
+        port = null;
       }
 
       if (device == null) {
         setState(() {
-          _status = "Disconnected";
+          status = "Disconnected";
         });
-        _logs.add("Device is null, disconnected.");
+        logs.add("Device is null, disconnected.");
         return true;
       }
 
-      _logs.add("Creating port for the device.");
-      _port = await device.create();
-      if (await (_port!.open()) != true) {
+      logs.add("Creating port for the device.");
+      port = await device.create();
+      if (await (port!.open()) != true) {
         setState(() {
-          _status = "Failed to open port";
+          status = "Failed to open port";
         });
-        _logs.add("Failed to open port");
+        logs.add("Failed to open port");
         return false;
       }
 
-      _logs.add("Setting port parameters.");
-      await _port!.setPortParameters(
-          9600, // Check the correct baud rate for WindSonic 75
-          UsbPort.DATABITS_8,
-          UsbPort.STOPBITS_1,
-          UsbPort.PARITY_NONE); // Ensure these match your device's settings
+      port!.setDTR(true);
+      port!.setRTS(true);
 
-      _logs.add("Listening to input stream.");
-      _subscription = _port!.inputStream!.listen((Uint8List data) {
-        setState(() {
-          _serialData.add("Received raw data: ${data.toString()}");
-          // String receivedData = String.fromCharCodes(data);
-          // _serialData.add(receivedData);
-          // if (_serialData.length > 20) {
-          //   _serialData.removeAt(0);
-          // }
-        });
-      });
+      logs.add("Setting port parameters.");
+      await port!.setPortParameters(
+        9600, // Check the correct baud rate for WindSonic 75
+        UsbPort.DATABITS_8,
+        UsbPort.STOPBITS_1,
+        UsbPort.PARITY_NONE,
+      ); // Ensure these match your device's settings
+      await port!.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
+
+      logs.add("Port is ready.");
 
       setState(() {
-        _status = "Connected";
+        status = "Connected";
       });
-      _logs.add("Connected");
+      logs.add("Connected");
       return true;
     } catch (e) {
       setState(() {
-        _status = "Error: ${e.toString()}";
+        status = "Error: ${e.toString()}";
       });
-      _logs.add("Error: ${e.toString()}");
+      logs.add("Error: ${e.toString()}");
       return false;
     }
+  }
+
+  Future<void> readData() async {
+    try {
+      // TURN ON THE DEVICE
+      logs.add("Turning on the device.");
+      port!.write(Uint8List.fromList('**'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+
+      subscription = port!.inputStream!.listen((data) {
+        // buffer += utf8.decode(data);
+        onDataReceived(data);
+      });
+
+      if (serialData.contains("CONFIGURATION MODE".codeUnits)) {
+        brunConfigurationMode = true;
+      }
+
+      if (brunConfigurationMode) {
+        // COMMANDS
+        List<String> commands = ['L1', 'M3', 'O1', 'P2', 'U5'];
+
+        logs.add("Entering Configuration Mode!");
+
+        port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+        await Future.delayed(const Duration(seconds: 3));
+        bool bWriteConfig = false;
+        logs.add("Checking if values are correct.");
+
+        for (String command in commands) {
+          if (!serialData.contains(command.codeUnits)) {
+            bWriteConfig = true;
+            break; // No need to continue checking once we know we need to write config
+          }
+        }
+
+        if (bWriteConfig) {
+          for (var command in commands) {
+            port?.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+          }
+          port?.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+        }
+      }
+      subscription!.cancel();
+      logs.add("Going back to measurement mode.");
+      await Future.delayed(const Duration(seconds: 3));
+      port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
+      await Future.delayed(const Duration(seconds: 5));
+
+      for (int i = 0; i < 3; i++) {
+        port!.write(Uint8List.fromList('Q'.codeUnits));
+
+        subscription = port!.inputStream!.listen((data) {
+          onDataReceived(data);
+          // Process and display the data here
+          // Example: parse the received data into the expected format
+        });
+      }
+
+      // port!.write(Uint8List.fromList('Q'.codeUnits));
+      // await Future.delayed(const Duration(seconds: 1));
+      // await Future.delayed(const Duration(seconds: 1));
+
+      // await Future.delayed(const Duration(seconds: 1));
+      // port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
+      // await Future.delayed(const Duration(seconds: 5));
+      // await Future.delayed(const Duration(seconds: 1));
+      // port!.write(Uint8List.fromList('Q'.codeUnits));
+
+      // logs.add("Reading data from the port.");
+      // subscription = port!.inputStream!.listen((data) {
+      //   onDataReceived(data);
+      // });
+    } catch (e) {
+      logs.add("Error: ${e.toString()}");
+    }
+  }
+
+  Future<void> get(int numSampling) async {
+    serialData.clear();
+    logs.clear();
+    logs.add("Reading data from the port.");
+    const int intervalSec = 1;
+    if (numSampling == 1) {
+      return;
+    }
+
+    while (numSampling != 0) {
+      port!.write(Uint8List.fromList('Q'.codeUnits));
+      subscription = port!.inputStream!.listen((data) {
+        onDataReceived(data);
+        // Process and display the data here
+        // Example: parse the received data into the expected format
+      });
+
+      await Future.delayed(const Duration(seconds: intervalSec));
+    }
+  }
+
+  void onDataReceived(Uint8List data) {
+    String receivedMsg = utf8.decode(data);
+    setState(() {
+      logs.add(receivedMsg);
+    });
+    setState(() {
+      serialData.add(data);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: const Text('USB Serial Plugin example app'),
-      ),
-      body: SingleChildScrollView(
-        child: Center(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Airstat Test'),
+        ),
+        body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 50),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
-              children: <Widget>[
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                IntrinsicHeight(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      border: Border.all(),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Test Information",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text("Status: $status"),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "Device: ${port?.toString() ?? 'No Port Connected'}",
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "Data Received: ${serialData.length}",
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        if (logs.isNotEmpty)
+                          IntrinsicHeight(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Divider(),
+                                const Text(
+                                  "Logs",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  "${logs.join('\n')}\n",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  "Step 1. Check the available serial devices",
+                  style: TextStyle(
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
                 TextButton(
+                  style: TextButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary),
                   onPressed: () async {
                     List<UsbDevice> serialList = await UsbSerial.listDevices();
 
-                    setState(() {
-                      _devices.clear();
-                      _devices.addAll(serialList);
-                    });
+                    setState(
+                      () {
+                        devices.clear();
+                        devices.addAll(serialList);
+                      },
+                    );
                   },
-                  child: const Text(
+                  child: Text(
                     "Check Serial Connection",
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.background),
                   ),
                 ),
-                if (_logs.isNotEmpty)
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                      itemCount: _logs.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_logs[index]),
-                        );
-                      },
-                    ),
-                  ),
-                if (_devices.isNotEmpty)
-                  SizedBox(
-                    height: 200,
-                    child: ListView.builder(
-                      itemCount: _devices.length,
-                      itemBuilder: (context, index) {
-                        final UsbDevice device = _devices[index];
-                        return ListTile(
-                          leading: const Icon(Icons.usb),
-                          title: Text(device.deviceId.toString()),
-                          subtitle: Text(device.manufacturerName ?? ''),
-                          onTap: () async {
-                            await _connectTo(device);
-                            if (context.mounted) {
-                              informationSnackBar(
-                                  context, Icons.usb, "Connecting...");
-                            }
+                const SizedBox(
+                  height: 5,
+                ),
+                if (devices.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const Text("Step 2. Tap the device to connect"),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 200,
+                        child: ListView.builder(
+                          itemCount: devices.length,
+                          itemBuilder: (context, index) {
+                            final UsbDevice device = devices[index];
+                            return ListTile(
+                              leading: const Icon(Icons.usb),
+                              title: Text(device.deviceId.toString()),
+                              subtitle: Text(device.manufacturerName ?? ''),
+                              onTap: () async {
+                                bool result = await connectTo(device);
+
+                                if (result) {
+                                  if (context.mounted) {
+                                    informationSnackBar(context, Icons.usb,
+                                        "Connected to device ${device.deviceId}");
+                                  } else {
+                                    if (context.mounted) {
+                                      informationSnackBar(context, Icons.usb,
+                                          "Failed to connect to the ${device.deviceId}");
+                                    }
+                                  }
+                                }
+                              },
+                            );
                           },
-                        );
-                      },
+                        ),
+                      ),
+                    ],
+                  ),
+                if (port != null)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const Text(
+                        "Step 3. Request to read data from the device",
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary),
+                            onPressed: () async {
+                              logs.add("Requested to read data.");
+
+                              await readData();
+
+                              if (context.mounted) {
+                                informationSnackBar(context, Icons.usb,
+                                    "Requesting to read data");
+                              }
+                            },
+                            child: Text(
+                              "Read Data",
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.background),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary),
+                            onPressed: () async {
+                              logs.add("Try getting CrossDraftDowndDraft.");
+
+                              await get(1);
+
+                              if (context.mounted) {
+                                informationSnackBar(context, Icons.usb,
+                                    "Requesting to read CrossDraftDowndDraft");
+                              }
+                            },
+                            child: Text(
+                              "GetCrossDraftDowndDraft",
+                              style: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.background),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                if (serialData.isNotEmpty)
+                  SizedBox(
+                    height: 500,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Divider(),
+                          const Text(
+                            "Data",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          Text("Serial Data: $serialData"),
+                        ],
+                      ),
                     ),
                   ),
-                Text('Status: $_status\n'),
-                Text('info: ${_port.toString()}\n'),
-                if (_serialData.isNotEmpty)
-                  Text("RESULT: ${_serialData.join('\n')}\n"),
-                Text("RESULT: ${_serialData.join('\n')}\n",
-                    style: Theme.of(context).textTheme.titleLarge),
-                if (_logs.isNotEmpty) Text("RESULT: ${_logs.join('\n')}\n"),
               ],
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }
