@@ -12,7 +12,7 @@ void informationSnackBar(
         children: [
           Icon(
             icon,
-            color: Theme.of(context).colorScheme.tertiaryContainer,
+            color: Theme.of(context).colorScheme.background,
           ),
           const SizedBox(
             width: 10,
@@ -20,7 +20,7 @@ void informationSnackBar(
           Text(
             text,
             style: TextStyle(
-              color: Theme.of(context).colorScheme.tertiaryContainer,
+              color: Theme.of(context).colorScheme.background,
             ),
           ),
         ],
@@ -29,7 +29,7 @@ void informationSnackBar(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      backgroundColor: Theme.of(context).colorScheme.tertiary,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       elevation: 4,
       padding: const EdgeInsets.all(20),
     ),
