@@ -102,22 +102,31 @@ class _BoothPage extends State<BoothPage> {
     logs.clear();
     serialData.clear();
     try {
+      // TURN ON THE DEVICE
+      logs.add("Turning on the device.");
+      port!.write(Uint8List.fromList('**'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+
       subscription = port!.inputStream!.listen((data) {
         onDataReceived(data);
       });
 
-      // TURN ON THE DEVICE
-      logs.add("Turning on the device.");
-      port!.write(Uint8List.fromList('*\r\n'.codeUnits));
-      await Future.delayed(const Duration(seconds: 5));
+      // port!.write(Uint8List.fromList('Q'.codeUnits));
+      // await Future.delayed(const Duration(seconds: 3));
 
       logs.add("Entering Configuration Mode");
-      port!.write(Uint8List.fromList('D3\r\n'.codeUnits));
-      await Future.delayed(const Duration(seconds: 5));
+      port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+      List<String> commands = ['L1', 'M3', 'O1', 'P2', 'U5'];
 
+      for (String command in commands) {
+        port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+      }
       logs.add("Going back to measurement mode.");
-      await Future.delayed(const Duration(seconds: 5));
-      port!.write(Uint8List.fromList('Q\r\n'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+      port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+
       setState(() {
         isLoading = false;
       });
