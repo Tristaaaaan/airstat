@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:airstat/components/snackbar/information_snackbar.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:usb_serial/transaction.dart';
 import 'package:usb_serial/usb_serial.dart';
@@ -16,8 +17,9 @@ class BoothPage extends StatefulWidget {
 
 class _BoothPage extends State<BoothPage> {
   UsbPort? port;
+  bool isLoading = false;
   String status = "Idle";
-
+  final AudioPlayer player = AudioPlayer();
   final List<Uint8List> serialData = [];
   final List<UsbDevice> devices = [];
   final List<String> logs = [];
@@ -94,6 +96,11 @@ class _BoothPage extends State<BoothPage> {
   }
 
   Future<void> readData() async {
+    setState(() {
+      isLoading = true;
+    });
+    logs.clear();
+    serialData.clear();
     try {
       // TURN ON THE DEVICE
       logs.add("Turning on the device.");
@@ -101,92 +108,33 @@ class _BoothPage extends State<BoothPage> {
       await Future.delayed(const Duration(seconds: 3));
 
       subscription = port!.inputStream!.listen((data) {
-        // buffer += utf8.decode(data);
         onDataReceived(data);
       });
 
-      if (serialData.contains("CONFIGURATION MODE".codeUnits)) {
-        brunConfigurationMode = true;
+      // port!.write(Uint8List.fromList('Q'.codeUnits));
+      // await Future.delayed(const Duration(seconds: 3));
+
+      logs.add("Entering Configuration Mode");
+      port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+      await Future.delayed(const Duration(seconds: 3));
+      List<String> commands = ['L1', 'M3', 'O1', 'P2', 'U5'];
+
+      for (String command in commands) {
+        port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
       }
-
-      if (brunConfigurationMode) {
-        // COMMANDS
-        List<String> commands = ['L1', 'M3', 'O1', 'P2', 'U5'];
-
-        logs.add("Entering Configuration Mode!");
-
-        port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-        await Future.delayed(const Duration(seconds: 3));
-        bool bWriteConfig = false;
-        logs.add("Checking if values are correct.");
-
-        for (String command in commands) {
-          if (!serialData.contains(command.codeUnits)) {
-            bWriteConfig = true;
-            break; // No need to continue checking once we know we need to write config
-          }
-        }
-
-        if (bWriteConfig) {
-          for (var command in commands) {
-            port?.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
-          }
-          port?.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-        }
-      }
-      subscription!.cancel();
       logs.add("Going back to measurement mode.");
       await Future.delayed(const Duration(seconds: 3));
       port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-      await Future.delayed(const Duration(seconds: 5));
+      await Future.delayed(const Duration(seconds: 3));
 
-      for (int i = 0; i < 3; i++) {
-        port!.write(Uint8List.fromList('Q'.codeUnits));
-
-        subscription = port!.inputStream!.listen((data) {
-          onDataReceived(data);
-          // Process and display the data here
-          // Example: parse the received data into the expected format
-        });
-      }
-
-      // port!.write(Uint8List.fromList('Q'.codeUnits));
-      // await Future.delayed(const Duration(seconds: 1));
-      // await Future.delayed(const Duration(seconds: 1));
-
-      // await Future.delayed(const Duration(seconds: 1));
-      // port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-      // await Future.delayed(const Duration(seconds: 5));
-      // await Future.delayed(const Duration(seconds: 1));
-      // port!.write(Uint8List.fromList('Q'.codeUnits));
-
-      // logs.add("Reading data from the port.");
-      // subscription = port!.inputStream!.listen((data) {
-      //   onDataReceived(data);
-      // });
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
       logs.add("Error: ${e.toString()}");
-    }
-  }
-
-  Future<void> get(int numSampling) async {
-    serialData.clear();
-    logs.clear();
-    logs.add("Reading data from the port.");
-    const int intervalSec = 1;
-    if (numSampling == 1) {
-      return;
-    }
-
-    while (numSampling != 0) {
-      port!.write(Uint8List.fromList('Q'.codeUnits));
-      subscription = port!.inputStream!.listen((data) {
-        onDataReceived(data);
-        // Process and display the data here
-        // Example: parse the received data into the expected format
+      setState(() {
+        isLoading = false;
       });
-
-      await Future.delayed(const Duration(seconds: intervalSec));
     }
   }
 
@@ -365,54 +313,36 @@ class _BoothPage extends State<BoothPage> {
                       const SizedBox(
                         height: 5,
                       ),
-                      Row(
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary),
-                            onPressed: () async {
-                              logs.add("Requested to read data.");
+                      TextButton(
+                        style: TextButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary),
+                        onPressed: isLoading
+                            ? () {}
+                            : () async {
+                                logs.add("Requested to read data.");
+                                await player.play(
+                                    AssetSource('audios/beep-09.wav'),
+                                    volume: 1);
+                                await readData();
 
-                              await readData();
-
-                              if (context.mounted) {
-                                informationSnackBar(context, Icons.usb,
-                                    "Requesting to read data");
-                              }
-                            },
-                            child: Text(
-                              "Read Data",
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.background),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          TextButton(
-                            style: TextButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary),
-                            onPressed: () async {
-                              logs.add("Try getting CrossDraftDowndDraft.");
-
-                              await get(1);
-
-                              if (context.mounted) {
-                                informationSnackBar(context, Icons.usb,
-                                    "Requesting to read CrossDraftDowndDraft");
-                              }
-                            },
-                            child: Text(
-                              "GetCrossDraftDowndDraft",
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.background),
-                            ),
-                          ),
-                        ],
+                                if (context.mounted) {
+                                  informationSnackBar(context, Icons.usb,
+                                      "Requesting to read data");
+                                }
+                              },
+                        child: isLoading
+                            ? const CircularProgressIndicator()
+                            : Text(
+                                "Read Data",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .background),
+                              ),
+                      ),
+                      const SizedBox(
+                        width: 10,
                       ),
                     ],
                   ),
