@@ -20,7 +20,57 @@ class Settings extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        centerTitle: true,
+        actions: const [
+          Row(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Sampling: ",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Sampling",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Delay: ",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Sampling",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 15,
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Units: ",
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Sampling",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 25,
+              ),
+            ],
+          )
+        ],
       ),
       body: const SingleChildScrollView(
         child: Column(

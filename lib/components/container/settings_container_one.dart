@@ -1,5 +1,4 @@
-import 'package:airstat/components/container/values_container.dart';
-import 'package:airstat/provider/settings_provider.dart';
+import 'package:airstat/main/settings/space_definition.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -12,8 +11,6 @@ class SettingsContainerOne extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settingsNotifier = ref.watch(unitsProvider.notifier);
-    final settingsState = ref.watch(unitsProvider);
     return Padding(
       padding: const EdgeInsets.all(15),
       child: Row(
@@ -23,16 +20,31 @@ class SettingsContainerOne extends ConsumerWidget {
             category,
             style: const TextStyle(fontSize: 20),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ContainerValues(
-                value: "Manage space definitions",
-                state: settingsState,
-                notifier: settingsNotifier,
-                width: 315,
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return const SpaceDefinition();
+                  },
+                ),
+              );
+            },
+            child: Container(
+              width: 315,
+              padding: const EdgeInsets.all(5),
+              decoration:
+                  BoxDecoration(color: Theme.of(context).colorScheme.primary),
+              child: Text(
+                "Manage Space Definitions",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Theme.of(context).colorScheme.background,
+                ),
               ),
-            ],
+            ),
           )
         ],
       ),

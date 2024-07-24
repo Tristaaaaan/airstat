@@ -1,25 +1,66 @@
 import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/booth_page.dart';
-import 'package:airstat/main/continuous_page.dart';
+import 'package:airstat/main/continuous/continuous_main_page.dart';
 import 'package:airstat/main/file_page.dart';
-import 'package:airstat/main/settings.dart';
+import 'package:airstat/main/random/random_reading_mode.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/main/three_d_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class Home extends StatelessWidget {
+class Home extends HookConsumerWidget {
   const Home({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final usbDevices = ref.watch(usbDevicesProvider);
+    // final subscription = ref.watch(subscriptionProvider);
+    // Function to initialize USB devices
+    // void initializeUsbDevices() async {
+    //   // Add logic to fetch and set USB devices
+    //   // Example:
+    //   List<UsbDevice> serialList = await UsbSerial.listDevices();
+
+    //   ref.read(usbDevicesProvider.notifier).state = serialList;
+
+    //   if (subscription != null) {
+    //     await ref.read(subscriptionProvider.notifier).state!.cancel();
+    //     ref.read(subscriptionProvider.notifier).state = null;
+    //   }
+
+    //   UsbPort port = (await serialList.first.create())!;
+    //   ref.read(usbPortProvider.notifier).state = port;
+
+    //   port.setDTR(true);
+    //   port.setRTS(true);
+
+    //   await port.setPortParameters(
+    //     9600, // Check the correct baud rate for WindSonic 75
+    //     UsbPort.DATABITS_8,
+    //     UsbPort.STOPBITS_1,
+    //     UsbPort.PARITY_NONE,
+    //   ); // Ensure these match your device's settings
+    // }
+
+    // useEffect(() {
+    //   if (usbDevices.isEmpty) {
+    //     initializeUsbDevices();
+    //   }
+    //   return null;
+    // }, [usbDevices]);
+
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Airstat'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         child: Column(
           children: [
             Expanded(
               child: GridView(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                  crossAxisCount: 4,
                 ),
                 children: [
                   MenuContainer(
@@ -51,7 +92,8 @@ class Home extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Continuous()),
+                            builder: (context) =>
+                                const ContinuousReadingMode()),
                       );
                     },
                   ),
@@ -75,9 +117,17 @@ class Home extends StatelessWidget {
                     image: 'assets/icons/Icon_OR.png',
                     label: 'O.R.',
                   ),
-                  const MenuContainer(
+                  MenuContainer(
                     image: 'assets/icons/Icon_random_orange.png',
                     label: 'Random',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RandomReadingMode(),
+                        ),
+                      );
+                    },
                   ),
                   MenuContainer(
                     image: 'assets/icons/Icon_settings_orange.png',
