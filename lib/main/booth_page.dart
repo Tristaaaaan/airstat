@@ -104,29 +104,48 @@ class _BoothPage extends State<BoothPage> {
     try {
       // TURN ON THE DEVICE
       logs.add("Turning on the device.");
-      port!.write(Uint8List.fromList('**'.codeUnits));
-      await Future.delayed(const Duration(seconds: 3));
-
+      await port!.write(Uint8List.fromList('**'.codeUnits));
+      await Future.delayed(Duration(seconds: 0.3.toInt()));
+      await port!.write(Uint8List.fromList('**'.codeUnits));
       subscription = port!.inputStream!.listen((data) {
         onDataReceived(data);
       });
 
-      // port!.write(Uint8List.fromList('Q'.codeUnits));
-      // await Future.delayed(const Duration(seconds: 3));
-
       logs.add("Entering Configuration Mode");
-      port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-      await Future.delayed(const Duration(seconds: 3));
-      List<String> commands = ['L1', 'M3', 'O1', 'P2', 'U5'];
+      await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+      await Future.delayed(Duration(seconds: 0.3.toInt()));
+      List<String> commands = [
+        'M2',
+        'U5',
+        'O1',
+        'L1',
+        'P1',
+        'B3',
+        'H1',
+        'NQ',
+        'F1',
+        'E3',
+        'T1',
+        'S4',
+        'C2',
+        'G0',
+        'K50',
+      ];
 
       for (String command in commands) {
-        port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+        await port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
       }
+      await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+
       logs.add("Going back to measurement mode.");
       await Future.delayed(const Duration(seconds: 3));
-      port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-      await Future.delayed(const Duration(seconds: 3));
+      await port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
 
+      await Future.delayed(const Duration(seconds: 5));
+
+      for (int i = 0; i < 3; i++) {
+        await port!.write(Uint8List.fromList('Q'.codeUnits));
+      }
       setState(() {
         isLoading = false;
       });
