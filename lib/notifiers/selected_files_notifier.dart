@@ -10,4 +10,8 @@ class SelectedFilesNotifier extends StateNotifier<List<String>> {
       state = [...state, filePath];
     }
   }
+
+  void clearSelection() {
+    state = [];
+  }
 }
