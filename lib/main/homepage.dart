@@ -1,7 +1,7 @@
 import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/booth_page.dart';
 import 'package:airstat/main/continuous/continuous_main_page.dart';
-import 'package:airstat/main/file_page.dart';
+import 'package:airstat/main/files/file_page.dart';
 import 'package:airstat/main/random/random_reading_mode.dart';
 import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/main/three_d_page.dart';
@@ -15,7 +15,7 @@ class Home extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final usbDevices = ref.watch(usbDevicesProvider);
     // final subscription = ref.watch(subscriptionProvider);
-    // Function to initialize USB devices
+    // // Function to initialize USB devices
     // void initializeUsbDevices() async {
     //   // Add logic to fetch and set USB devices
     //   // Example:

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 class RegularTextField extends StatelessWidget {
   final String category;
   final String? hinttext;
+  final TextEditingController? controller;
   const RegularTextField({
     super.key,
     required this.category,
+    this.controller,
     this.hinttext = "",
   });
 
@@ -24,6 +26,7 @@ class RegularTextField extends StatelessWidget {
             child: SizedBox(
               width: 315,
               child: TextField(
+                controller: controller,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   hintText: hinttext,

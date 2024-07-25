@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:airstat/components/button/regular_button.dart';
-import 'package:airstat/components/snackbar/information_snackbar.dart';
-import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/continuous/continuous_save_data.dart';
+import 'package:airstat/models/serial_data_model.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,97 @@ final isReadingProvider = StateProvider<bool>((ref) {
   return false;
 });
 
+final secondValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final thirdValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final saveDataProvider = StateProvider<List<ContinuousDataModel>>((ref) {
+  return [];
+});
+
+final timerProvider = StateProvider<Timer?>((ref) {
+  return null;
+});
+
+void startTimer(WidgetRef ref) {
+  // Retrieve the current timer from the provider
+  final currentTimer = ref.read(timerProvider);
+
+  // Cancel the existing timer if it exists
+  currentTimer?.cancel();
+// Create a new timer and store it in the provider
+  ref.read(timerProvider.notifier).state =
+      Timer.periodic(const Duration(seconds: 5), (timer) {
+    final serialData = ref.read(serialDataProvider);
+
+    // Get the current time in seconds since the timer started
+    final secondsElapsed =
+        timer.tick * 5; // Since the timer ticks every 5 seconds
+
+    // Insert the time into the test data
+    ref.read(serialDataProvider.notifier).addData('Q, +0001, -0002');
+
+    if (serialData.isNotEmpty) {
+      final secondVal = getSecondValue(serialData.last);
+      final thirdVal = getThirdValue(serialData.last);
+
+      ref.read(secondValueProvider.notifier).state = secondVal;
+      ref.read(thirdValueProvider.notifier).state = thirdVal;
+
+      ref
+          .read(toBeSavedDataProvider.notifier)
+          .addData('$secondsElapsed, $secondVal, $thirdVal');
+    }
+  });
+}
+
+void stopTimer(WidgetRef ref) {
+  // Retrieve the current timer from the provider and cancel it
+  final currentTimer = ref.read(timerProvider);
+  currentTimer?.cancel();
+  ref.read(timerProvider.notifier).state = null;
+}
+
+String getSecondValue(String data) {
+  List<String> parts = data.split(','); // Split the string by commas
+  if (parts.length < 2) {
+    return "--.-"; // Return default if there are not enough parts
+  }
+  String secondValue = parts[1].trim();
+
+  if (secondValue.isEmpty) {
+    return "--.-";
+  } else {
+    // Convert the value to an integer to handle leading zeros
+    int intValue = int.parse(secondValue);
+    // Multiply by -1
+    intValue *= -1;
+    // Convert the result back to a string and return it
+    return intValue.toString();
+  }
+}
+
+String getThirdValue(String data) {
+  List<String> parts = data.split(','); // Split the string by commas
+  if (parts.length < 3) {
+    return "--.-"; // Return default if there are not enough parts
+  }
+  String thirdValue = parts[2].trim();
+
+  if (thirdValue.isEmpty) {
+    return "--.-";
+  } else {
+    // Convert the value to an integer to handle leading zeros
+    int intValue = int.parse(thirdValue);
+    // Convert the result back to a string and return it
+    return intValue.toString();
+  }
+}
+
 class ContinuosReadingData extends ConsumerWidget {
   const ContinuosReadingData({super.key});
 
@@ -24,7 +117,8 @@ class ContinuosReadingData extends ConsumerWidget {
     final AudioPlayer player = AudioPlayer();
     final stopWatchTimer = ref.watch(stopWatchTimerProvider);
     final serialData = ref.watch(serialDataProvider);
-
+    final secondValue = ref.watch(secondValueProvider);
+    final thirdValue = ref.watch(thirdValueProvider);
     final isReading = ref.watch(isReadingProvider);
     return Scaffold(
       appBar: AppBar(
@@ -51,9 +145,7 @@ class ContinuosReadingData extends ConsumerWidget {
                           width: 20,
                         ),
                         Text(
-                          serialData.isEmpty
-                              ? "--.-"
-                              : secondValue(serialData.last),
+                          serialData.isEmpty ? "--.-" : secondValue,
                           style: const TextStyle(fontSize: 120),
                         )
                       ],
@@ -72,9 +164,7 @@ class ContinuosReadingData extends ConsumerWidget {
                           width: 20,
                         ),
                         Text(
-                          serialData.isEmpty
-                              ? "--.-"
-                              : thirdValue(serialData.last),
+                          serialData.isEmpty ? "--.-" : thirdValue,
                           style: const TextStyle(fontSize: 120),
                         )
                       ],
@@ -86,7 +176,7 @@ class ContinuosReadingData extends ConsumerWidget {
             Expanded(
               child: Center(
                 child: StreamBuilder<int>(
-                  stream: stopWatchTimer.rawTime,
+                  stream: stopWatchTimer.secondTime,
                   initialData: 0,
                   builder: (context, snap) {
                     final value = snap.data;
@@ -132,13 +222,17 @@ class ContinuosReadingData extends ConsumerWidget {
                     onTap: !isReading
                         ? () {}
                         : () async {
-                            ref.read(isReadingProvider.notifier).state = false;
-                            stopWatchTimer.onStopTimer();
-                            await stopContinuousData(ref);
-                            if (context.mounted) {
-                              informationSnackBar(context, Icons.info,
-                                  "Data reading has stopped.");
-                            }
+                            // ORIGINAL CODE
+                            // ref.read(isReadingProvider.notifier).state = false;
+                            // stopWatchTimer.onStopTimer();
+                            // await stopContinuousData(ref);
+                            // if (context.mounted) {
+                            //   informationSnackBar(context, Icons.info,
+                            //       "Data reading has stopped.");
+                            // }
+
+                            // TESTING CODE
+                            stopTimer(ref);
                           }),
                 const SizedBox(width: 10),
                 RegularButton(
@@ -151,17 +245,22 @@ class ContinuosReadingData extends ConsumerWidget {
                   onTap: isReading
                       ? () {}
                       : () async {
-                          ref.read(isReadingProvider.notifier).state = true;
-                          await player.play(AssetSource('audios/beep-09.wav'),
-                              volume: 1);
-                          stopWatchTimer.onResetTimer();
+                          // ORIGINAL CODE
+                          // ref.read(isReadingProvider.notifier).state = true;
+                          // await player.play(AssetSource('audios/beep-09.wav'),
+                          //     volume: 1);
+                          // stopWatchTimer.onResetTimer();
 
-                          await readContinuousData(ref);
-                          stopWatchTimer.onStartTimer();
-                          if (context.mounted) {
-                            informationSnackBar(context, Icons.info,
-                                "Data reading has started.");
-                          }
+                          // await readContinuousData(ref);
+                          // startTimer(ref);
+                          // if (context.mounted) {
+                          //   informationSnackBar(context, Icons.info,
+                          //       "Data reading has started.");
+                          // }
+
+                          // TESTING CODE
+                          stopWatchTimer.onResetTimer();
+                          startTimer(ref);
                         },
                 ),
                 const SizedBox(width: 10),
@@ -170,7 +269,17 @@ class ContinuosReadingData extends ConsumerWidget {
                   textColor: Theme.of(context).colorScheme.background,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   width: 100,
-                  onTap: () {},
+                  onTap: () {
+                    if (serialData.isNotEmpty) {
+                      stopTimer(ref);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ContinuousSaveData(),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -178,36 +287,5 @@ class ContinuosReadingData extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-String removeTrailingZeroes(String value) {
-  // Remove trailing zeroes
-  return value.replaceFirst(RegExp(r'^0+'), '');
-}
-
-String secondValue(String data) {
-  List<String> parts = data.split(','); // Split the string by commas
-  String secondValue = parts[1].trim();
-
-  if (secondValue.isEmpty) {
-    return "--.-";
-  } else {
-    // Remove trailing zeroes
-    String cleanedValue = removeTrailingZeroes(secondValue);
-    // Assuming you want to transform the cleaned value into a negative number
-    String transformedValue = (-int.parse(cleanedValue)).toString();
-    return transformedValue;
-  }
-}
-
-String thirdValue(String data) {
-  List<String> parts = data.split(','); // Split the string by commas
-  String thirdValue = parts[2].trim();
-
-  if (thirdValue.isEmpty) {
-    return "--.-";
-  } else {
-    return removeTrailingZeroes(thirdValue);
   }
 }

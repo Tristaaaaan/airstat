@@ -19,6 +19,25 @@ class SerialDataNotifier extends StateNotifier<List<String>> {
   }
 }
 
+// Define the provider
+final toBeSavedDataProvider =
+    StateNotifierProvider<SaveDataNotifier, List<String>>((ref) {
+  return SaveDataNotifier();
+});
+
+// StateNotifier implementation
+class SaveDataNotifier extends StateNotifier<List<String>> {
+  SaveDataNotifier() : super([]);
+
+  void addData(String data) {
+    state = [...state, data];
+  }
+
+  void clearData() {
+    state = [];
+  }
+}
+
 final isLoadingProvider = StateProvider<bool>((ref) {
   return false;
 });

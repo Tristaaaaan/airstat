@@ -53,7 +53,7 @@ Future<String> readContinuousData(WidgetRef ref) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
     List<String> commands = [
-      'M3',
+      'M1',
       'U5',
       'O1',
       'L1',
