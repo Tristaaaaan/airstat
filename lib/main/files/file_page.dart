@@ -8,6 +8,29 @@ import 'package:airstat/provider/save_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+final fileContentProvider =
+    StateNotifierProvider<FileContentNotifier, Map<String, String>>(
+  (ref) => FileContentNotifier(),
+);
+
+class FileContentNotifier extends StateNotifier<Map<String, String>> {
+  FileContentNotifier() : super({});
+
+  void setContent(String filePath, String content) {
+    state = {...state, filePath: content};
+  }
+
+  void removeContent(String filePath) {
+    final newState = {...state};
+    newState.remove(filePath);
+    state = newState;
+  }
+
+  void clearContent() {
+    state = {};
+  }
+}
+
 class FilePage extends ConsumerWidget {
   const FilePage({super.key});
   @override
@@ -15,7 +38,7 @@ class FilePage extends ConsumerWidget {
     final saveDataServices = ref.watch(saveDataServicesProvider);
     final files = ref.watch(fileListProvider);
     final selectedFiles = ref.watch(selectedFilesProvider);
-
+    final selectedFileContent = ref.watch(fileContentProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Files"),
@@ -46,12 +69,26 @@ class FilePage extends ConsumerWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () async {
+                        final filePath = files[index];
                         ref
                             .read(selectedFilesProvider.notifier)
-                            .toggleSelection(files[index]);
-                        final fileContent =
-                            await File(files[index]).readAsString();
-                        print(fileContent);
+                            .toggleSelection(filePath);
+
+                        final isSelected =
+                            ref.read(selectedFilesProvider).contains(filePath);
+
+                        if (isSelected) {
+                          final fileContent =
+                              await File(filePath).readAsString();
+                          ref
+                              .read(fileContentProvider.notifier)
+                              .setContent(filePath, fileContent);
+                          print(fileContent);
+                        } else {
+                          ref
+                              .read(fileContentProvider.notifier)
+                              .removeContent(filePath);
+                        }
                       },
                       child: Center(
                         child: Container(
@@ -121,8 +158,13 @@ class FilePage extends ConsumerWidget {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 width: double.infinity,
                 onTap: () async {
+                  final date = DateTime.now();
                   print("ADD DATA");
-                  await saveDataServices.writeContent();
+                  await saveDataServices.writeContent(
+                    'continuous',
+                    date,
+                    date,
+                  );
                   // Refresh the file list after saving the new file
                   ref.read(fileListProvider.notifier).refresh();
                 },
@@ -135,7 +177,12 @@ class FilePage extends ConsumerWidget {
                 textColor: Theme.of(context).colorScheme.background,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 width: double.infinity,
-                onTap: () {},
+                onTap: () {
+                  for (var filePath in selectedFileContent.keys) {
+                    final content = selectedFileContent[filePath];
+                    print('Content of $filePath: $content');
+                  }
+                },
               ),
             ),
             const SizedBox(width: 5),

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
+import 'package:airstat/main/files/file_page.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
@@ -23,14 +23,25 @@ class SaveFiles {
     return File('$path/$fileName.csv'); // Corrected the file path construction
   }
 
-  Future<File> writeContent() async {
+  Future<File?> writeContent(
+    String readingMode,
+    DateTime currentDate,
+    DateTime lastUpdate,
+  ) async {
     try {
       final file = await _localFile;
-      // Write the file
-      return file.writeAsString('Hello Folks');
+      if (readingMode == 'continuous') {
+        String csvContent =
+            '''dateTime: $currentDate, lastUpdate: $lastUpdate''';
+        // Write the file
+        return await file.writeAsString(csvContent);
+      } else {
+        // Return the file without writing if not in continuous mode
+        return file;
+      }
     } catch (e) {
       print('Error writing file: $e');
-      return Future.error(e);
+      return null;
     }
   }
 
@@ -49,16 +60,12 @@ class SaveFiles {
 
   Future<bool> exportCSV(WidgetRef ref) async {
     final selectedFiles = ref.read(selectedFilesProvider);
+    final fileContentMap = ref.read(fileContentProvider);
 
     if (selectedFiles.isEmpty) {
       // Handle the case where no files are selected
       return false;
     }
-
-    // Generate random data for the CSV
-    List<List<dynamic>> rows = generateRandomData();
-
-    String csv = const ListToCsvConverter().convert(rows);
 
     if (!await FlutterFileDialog.isPickDirectorySupported()) {
       return false;
@@ -69,13 +76,25 @@ class SaveFiles {
     if (pickedDirectory != null) {
       try {
         for (String filePath in selectedFiles) {
-          await FlutterFileDialog.saveFileToDirectory(
-            directory: pickedDirectory,
-            data: utf8.encode(csv), // Encode CSV string to bytes
-            mimeType: "text/csv", // Set MIME type for CSV files
-            fileName: filePath, // Set CSV file name
-            replace: true,
-          );
+          final fileContent = fileContentMap[filePath];
+          if (fileContent != null) {
+            // Prepare the data for CSV
+            List<List<dynamic>> rows = [];
+
+            // Add each file's content as a new row
+            rows.add([fileContent]);
+
+            String csv = const ListToCsvConverter().convert(rows);
+
+            await FlutterFileDialog.saveFileToDirectory(
+              directory: pickedDirectory,
+              data: utf8.encode(csv), // Encode CSV string to bytes
+              mimeType: "text/csv", // Set MIME type for CSV files
+              fileName:
+                  '${filePath.split('/').last}.csv', // Use the file's name with .csv extension
+              replace: true,
+            );
+          }
         }
         return true;
       } catch (e) {
@@ -85,26 +104,5 @@ class SaveFiles {
     } else {
       return false;
     }
-  }
-
-// Function to generate random data
-  List<List<dynamic>> generateRandomData() {
-    Random random = Random();
-    List<List<dynamic>> rows = [];
-
-    // Define the headers
-    List<String> headers = ["ID", "Name", "Value"];
-    rows.add(headers);
-
-    // Generate 10 rows of random data
-    for (int i = 0; i < 10; i++) {
-      List<dynamic> row = [];
-      row.add(i + 1); // ID
-      row.add("Item ${i + 1}"); // Name
-      row.add(random.nextInt(100)); // Random Value
-      rows.add(row);
-    }
-
-    return rows;
   }
 }
