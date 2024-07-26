@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:airstat/main/continuous/continuous_reading_page.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:airstat/provider/ports_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,12 +42,12 @@ Future<String> readContinuousData(WidgetRef ref) async {
     await port.write(Uint8List.fromList('**'.codeUnits));
 
     subscriptions = port.inputStream!.listen((data) async {
-      await Future.delayed(const Duration(seconds: 5));
       String receivedMsg = utf8.decode(data);
 
       ref.read(serialDataProvider.notifier).addData(receivedMsg);
     });
 
+    startTimer(ref);
     ref.read(subscriptionProvider.notifier).state = subscriptions;
 
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
@@ -57,7 +58,7 @@ Future<String> readContinuousData(WidgetRef ref) async {
       'U5',
       'O1',
       'L1',
-      'P2',
+      'P1',
       'B3',
       'H1',
       'NQ',

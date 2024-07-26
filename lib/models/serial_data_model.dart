@@ -22,7 +22,7 @@ class ContinuousDataModel {
   final String? hash;
   final String? asset;
   final String? appVersion;
-  final Headers headers;
+
   final List<String> readings;
   final String? notes;
 
@@ -50,21 +50,7 @@ class ContinuousDataModel {
     this.hash = '--.-',
     this.asset = '--.-',
     this.appVersion = '--.-',
-    required this.headers,
     required this.readings,
     this.notes = '--.-',
-  });
-}
-
-class Headers {
-  final String dataPoint;
-  final String pos;
-  final String dd;
-  final String cd;
-  Headers({
-    required this.dataPoint,
-    required this.pos,
-    required this.dd,
-    required this.cd,
   });
 }

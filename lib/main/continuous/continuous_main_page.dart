@@ -1,22 +1,27 @@
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/main/continuous/continuous_reading_page.dart';
+import 'package:airstat/provider/data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class ContinuousReadingMode extends StatelessWidget {
+class ContinuousReadingMode extends ConsumerWidget {
   const ContinuousReadingMode({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController zoneIdController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Continuous"),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           children: [
             RegularTextField(
               category: "Zone ID",
+              controller: zoneIdController,
             ),
           ],
         ),
@@ -39,11 +44,24 @@ class ContinuousReadingMode extends StatelessWidget {
               textColor: Theme.of(context).colorScheme.background,
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ContinuosReadingData()),
-              ),
+              onTap: () {
+                if (zoneIdController.text.isEmpty) {
+                  informationSnackBar(context, Icons.warning,
+                      "To proceed, kindly insert a zone ID");
+                } else {
+                  ref.read(serialDataProvider.notifier).clearData();
+
+                  ref.read(toBeSavedDataProvider.notifier).clearData();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ContinuosReadingData(
+                        zoneId: zoneIdController.text,
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ],
         ),
