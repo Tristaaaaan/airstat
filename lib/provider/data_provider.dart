@@ -21,16 +21,19 @@ class SerialDataNotifier extends StateNotifier<List<String>> {
 
 // Define the provider
 final toBeSavedDataProvider =
-    StateNotifierProvider<SaveDataNotifier, List<String>>((ref) {
+    StateNotifierProvider<SaveDataNotifier, List<List<String>>>((ref) {
   return SaveDataNotifier();
 });
 
 // StateNotifier implementation
-class SaveDataNotifier extends StateNotifier<List<String>> {
+class SaveDataNotifier extends StateNotifier<List<List<String>>> {
   SaveDataNotifier() : super([]);
 
   void addData(String data) {
-    state = [...state, data];
+    state = [
+      ...state,
+      [data]
+    ];
   }
 
   void clearData() {

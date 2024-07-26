@@ -16,23 +16,27 @@ class SaveFiles {
     return directory.path;
   }
 
-  Future<File> get _localFile async {
-    final fileName = DateTime.now()
-        .toIso8601String(); // Use ISO 8601 format for the file name
+  Future<File> _localFile(String fileName) async {
     final path = await _localPath;
     return File('$path/$fileName.csv'); // Corrected the file path construction
   }
 
   Future<File?> writeContent(
+    String fileName,
+    String unit,
     String readingMode,
     DateTime currentDate,
     DateTime lastUpdate,
+    String data,
+    String numSampling,
+    String delay,
+    String zoneId,
   ) async {
     try {
-      final file = await _localFile;
+      final file = await _localFile(fileName);
       if (readingMode == 'continuous') {
         String csvContent =
-            '''dateTime: $currentDate, lastUpdate: $lastUpdate''';
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: continuous, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
         // Write the file
         return await file.writeAsString(csvContent);
       } else {
@@ -42,19 +46,6 @@ class SaveFiles {
     } catch (e) {
       print('Error writing file: $e');
       return null;
-    }
-  }
-
-  Future<String> readContent() async {
-    try {
-      final file = await _localFile;
-      // Read the file
-      String contents = await file.readAsString();
-      return contents;
-    } catch (e) {
-      // If there is an error reading, return a default String
-      print('Error reading file: $e');
-      return 'Error';
     }
   }
 
@@ -72,18 +63,63 @@ class SaveFiles {
     }
 
     final pickedDirectory = await FlutterFileDialog.pickDirectory();
-    print("Picked directory: $pickedDirectory");
+
     if (pickedDirectory != null) {
       try {
         for (String filePath in selectedFiles) {
           final fileContent = fileContentMap[filePath];
+          String dataNotes = "";
+          String data = "";
           if (fileContent != null) {
-            // Prepare the data for CSV
             List<List<dynamic>> rows = [];
 
-            // Add each file's content as a new row
-            rows.add([fileContent]);
+            // Split the content string into key-value pairs
+            List<String> pairs = fileContent.split(", ");
+            for (String pair in pairs) {
+              int separatorIndex = pair.indexOf(": ");
+              if (separatorIndex != -1) {
+                String key = pair.substring(0, separatorIndex);
+                String value = pair.substring(separatorIndex + 2);
+                if (key != "data" && key != "notes") {
+                  rows.add([key, value]);
+                } else if (key == "notes") {
+                  dataNotes = value;
+                }
+              }
+            }
 
+            // Define a RegExp to match the 'data' field
+            final RegExp regExp = RegExp(r'data:\s*(\[\[.*?\]\])');
+
+            // Search for the pattern in the csvContent
+            final match = regExp.firstMatch(fileContent);
+            // Convert string to List<List<dynamic>>
+
+            if (match != null) {
+              // Extract the data value from the match
+              data = match.group(1)!;
+            } else {
+              print("Data field not found.");
+            }
+
+            List<List<dynamic>> dataList = List<List<dynamic>>.from(
+                json.decode(data).map((item) => List<dynamic>.from(item)));
+
+            // Create a new list with the condition applied
+            List<List<dynamic>> newList = List.from(dataList);
+            rows.add(['data_point', 'pos', 'dd', 'cd']);
+            // Add new data with `data_point` equal to 'DefaultUser1'
+            for (var data in newList) {
+              rows.add(['DefaultUser1', data[0], data[1], data[2]]);
+            }
+
+            // Print the result to verify
+            print("dataList: $dataList");
+
+            print("Notes: $dataNotes");
+            rows.add(['notes', '--.-']);
+
+            // Convert the list of lists into CSV format
             String csv = const ListToCsvConverter().convert(rows);
 
             await FlutterFileDialog.saveFileToDirectory(

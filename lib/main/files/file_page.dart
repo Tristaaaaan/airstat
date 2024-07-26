@@ -157,17 +157,7 @@ class FilePage extends ConsumerWidget {
                 textColor: Theme.of(context).colorScheme.background,
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 width: double.infinity,
-                onTap: () async {
-                  final date = DateTime.now();
-                  print("ADD DATA");
-                  await saveDataServices.writeContent(
-                    'continuous',
-                    date,
-                    date,
-                  );
-                  // Refresh the file list after saving the new file
-                  ref.read(fileListProvider.notifier).refresh();
-                },
+                onTap: () async {},
               ),
             ),
             const SizedBox(width: 5),
@@ -216,11 +206,6 @@ class FilePage extends ConsumerWidget {
                   } else {
                     await requestStoragePermissions();
                   }
-
-                  // Assuming saveDataServices is an instance of a class managing file operations
-                  // await saveDataServices.writeContent();
-                  // // Refresh the file list after saving the new file
-                  // ref.read(fileListProvider.notifier).refresh();
                 },
               ),
             ),
