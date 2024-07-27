@@ -34,8 +34,9 @@ class SettingsContainerOne extends ConsumerWidget {
             child: Container(
               width: 315,
               padding: const EdgeInsets.all(5),
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.primary),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(6)),
               child: Text(
                 "Manage Space Definitions",
                 textAlign: TextAlign.center,
