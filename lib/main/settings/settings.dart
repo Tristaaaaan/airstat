@@ -2,12 +2,11 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/container/settings_container_two.dart';
-import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
-import 'package:airstat/permission/permission_handlers.dart';
+import 'package:airstat/models/settings_model.dart';
+import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:usb_serial/usb_serial.dart';
 
 class Settings extends ConsumerWidget {
   const Settings({
@@ -105,30 +104,20 @@ class Settings extends ConsumerWidget {
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () async {
-                var status = await checkPermission();
+                AirstatSettingsModel settings = AirstatSettingsModel(
+                  delay: 1,
+                  sampling: 20,
+                  unit: "ft/min",
+                );
 
-                if (!status) {
-                  await requestPermissions();
-                } else {
-                  List<UsbDevice> serialList = await UsbSerial.listDevices();
-                  print(serialList);
-                  print(serialList);
-                  if (serialList.isEmpty) {
-                    print("Serial List: $serialList");
-                    print("Serial List is empty");
-                    if (context.mounted) {
-                      informationSnackBar(
-                          context, Icons.error, "There is no available ports");
-                    }
-                  } else {
-                    print("Serial List: $serialList");
-                    print("Serial List is empty");
-                    if (context.mounted) {
-                      informationSnackBar(context, Icons.check,
-                          "There are available ports. The available ports are: $serialList");
-                    }
-                  }
-                }
+                AirstatSettingsConfiguration config =
+                    AirstatSettingsConfiguration();
+                final dataBefore = await config.getAirstatSettingsDatabase();
+                print("Before Settings: $dataBefore");
+                await config.updateAirstatSettingsDatabase(settings);
+
+                final dataAfter = await config.getAirstatSettingsDatabase();
+                print("After Settings: $dataAfter");
               },
             ),
           ],
