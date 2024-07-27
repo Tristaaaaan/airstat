@@ -1,13 +1,67 @@
 import 'package:airstat/components/button/regular_button.dart';
-import 'package:airstat/components/container/settings_container.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
-import 'package:airstat/components/container/settings_container_two.dart';
-import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
-import 'package:airstat/permission/permission_handlers.dart';
+import 'package:airstat/models/settings_model.dart';
+import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:usb_serial/usb_serial.dart';
+
+const List<Widget> generalSampling = <Widget>[
+  Text('1'),
+  Text('2'),
+  Text('3'),
+  Text('4'),
+  Text('5')
+];
+
+const List<Widget> silhoutteVentsSampling = <Widget>[
+  Text('1'),
+  Text('2'),
+  Text('3'),
+  Text('4'),
+  Text('5')
+];
+
+const List<Widget> generalDelay = <Widget>[
+  Text('0'),
+  Text('2'),
+  Text('3'),
+  Text('4'),
+  Text('5')
+];
+
+const List<Widget> silhoutteVentsDelay = <Widget>[
+  Text('0'),
+  Text('2'),
+  Text('3'),
+  Text('4'),
+  Text('5')
+];
+
+const List<Widget> units = <Widget>[
+  Text('m/sec'),
+  Text('fit/min'),
+];
+
+final generalSamplingProvider = StateProvider<List<bool>>((ref) {
+  return [true, false, false, false, false];
+});
+
+final silhoutteVentsSamplingProvider = StateProvider<List<bool>>((ref) {
+  return [true, false, false, false, false];
+});
+
+final generalDelayProvider = StateProvider<List<bool>>((ref) {
+  return [true, false, false, false, false];
+});
+
+final silhoutteVentsDelayProvider = StateProvider<List<bool>>((ref) {
+  return [true, false, false, false, false];
+});
+
+final unitsProvider = StateProvider<List<bool>>((ref) {
+  return [true, false];
+});
 
 class Settings extends ConsumerWidget {
   const Settings({
@@ -16,7 +70,12 @@ class Settings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final serialComm = ref.watch(serialCommunicationProvider);
+    final selectedGeneralSampling = ref.watch(generalSamplingProvider);
+    final selectedSilhoutteVentsSampling =
+        ref.watch(silhoutteVentsSamplingProvider);
+    final selectedGeneralDelay = ref.watch(generalDelayProvider);
+    final selectedSilhoutteVentsDelay = ref.watch(silhoutteVentsDelayProvider);
+    final selectedUnits = ref.watch(unitsProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -72,17 +131,178 @@ class Settings extends ConsumerWidget {
           )
         ],
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            SettingsContainer(category: "General Sampling"),
-            SettingsContainer(category: "Silhouette / Vents Sampling"),
-            SettingsContainer(category: "General Delay"),
-            SettingsContainer(category: "Silhouette / Vents Delay"),
-            SettingsContainerTwo(category: "Units"),
-            SettingsContainerOne(category: "Spaces Configuration"),
-            RegularTextField(category: "User / Test ID", hinttext: "username"),
-            RegularTextField(category: "Cloud Folder", hinttext: "folder name"),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "General Sampling",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      ref.read(generalSamplingProvider.notifier).state =
+                          List.generate(
+                        selectedGeneralSampling.length,
+                        (i) => i == index,
+                      );
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.red[200],
+                    selectedColor: Colors.white,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.red[400],
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                      minWidth: 63,
+                    ),
+                    isSelected: selectedGeneralSampling,
+                    children: generalSampling,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Silhouette / Vents Sampling",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      ref.read(silhoutteVentsSamplingProvider.notifier).state =
+                          List.generate(
+                        selectedSilhoutteVentsSampling.length,
+                        (i) => i == index,
+                      );
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.red[200],
+                    selectedColor: Colors.white,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.red[400],
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                      minWidth: 63,
+                    ),
+                    isSelected: selectedSilhoutteVentsSampling,
+                    children: silhoutteVentsSampling,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "General Delay",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      ref.read(generalDelayProvider.notifier).state =
+                          List.generate(
+                        generalDelay.length,
+                        (i) => i == index,
+                      );
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.red[200],
+                    selectedColor: Colors.white,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.red[400],
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                      minWidth: 63,
+                    ),
+                    isSelected: selectedGeneralDelay,
+                    children: generalDelay,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Silhouette / Vents Delay",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      ref.read(silhoutteVentsDelayProvider.notifier).state =
+                          List.generate(
+                        silhoutteVentsDelay.length,
+                        (i) => i == index,
+                      );
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.red[200],
+                    selectedColor: Colors.white,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.red[400],
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                      minWidth: 63,
+                    ),
+                    isSelected: selectedSilhoutteVentsDelay,
+                    children: silhoutteVentsDelay,
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Units",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  ToggleButtons(
+                    direction: Axis.horizontal,
+                    onPressed: (int index) {
+                      ref.read(unitsProvider.notifier).state = List.generate(
+                        units.length,
+                        (i) => i == index,
+                      );
+                    },
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    selectedBorderColor: Colors.red[200],
+                    selectedColor: Colors.white,
+                    fillColor: Theme.of(context).colorScheme.primary,
+                    color: Colors.red[400],
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                      minWidth: 157.5,
+                    ),
+                    isSelected: selectedUnits,
+                    children: units,
+                  ),
+                ],
+              ),
+            ),
+            const SettingsContainerOne(category: "Spaces Configuration"),
+            const RegularTextField(
+                category: "User / Test ID", hinttext: "username"),
+            const RegularTextField(
+                category: "Cloud Folder", hinttext: "folder name"),
           ],
         ),
       ),
@@ -105,30 +325,20 @@ class Settings extends ConsumerWidget {
               backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () async {
-                var status = await checkPermission();
+                AirstatSettingsModel settings = AirstatSettingsModel(
+                  delay: 1,
+                  sampling: 20,
+                  unit: "ft/min",
+                );
 
-                if (!status) {
-                  await requestPermissions();
-                } else {
-                  List<UsbDevice> serialList = await UsbSerial.listDevices();
-                  print(serialList);
-                  print(serialList);
-                  if (serialList.isEmpty) {
-                    print("Serial List: $serialList");
-                    print("Serial List is empty");
-                    if (context.mounted) {
-                      informationSnackBar(
-                          context, Icons.error, "There is no available ports");
-                    }
-                  } else {
-                    print("Serial List: $serialList");
-                    print("Serial List is empty");
-                    if (context.mounted) {
-                      informationSnackBar(context, Icons.check,
-                          "There are available ports. The available ports are: $serialList");
-                    }
-                  }
-                }
+                AirstatSettingsConfiguration config =
+                    AirstatSettingsConfiguration();
+                final dataBefore = await config.getAirstatSettingsDatabase();
+                print("Before Settings: $dataBefore");
+                await config.updateAirstatSettingsDatabase(settings);
+
+                final dataAfter = await config.getAirstatSettingsDatabase();
+                print("After Settings: $dataAfter");
               },
             ),
           ],

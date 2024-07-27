@@ -11,10 +11,8 @@ enum ReadingModeLabels {
 }
 
 enum UnitLabels {
-  booth('Booth'),
-  or('OR'),
-  all('All'),
-  threed('3D');
+  booth('m/sec'),
+  or('ft/min');
 
   const UnitLabels(this.label);
 
@@ -36,6 +34,42 @@ enum RowLabels {
   twelve('12');
 
   const RowLabels(this.label);
+
+  final String label;
+}
+
+enum ReadingPerRowLabels {
+  one('1'),
+  two('2'),
+  three('3'),
+  four('4'),
+  five('5'),
+  six('6'),
+  seven('7'),
+  eight('8'),
+  nine('9');
+
+  const ReadingPerRowLabels(this.label);
+
+  final String label;
+}
+
+enum SilhouetteWidthLabels {
+  one('1'),
+  two('2'),
+  three('3');
+
+  const SilhouetteWidthLabels(this.label);
+
+  final String label;
+}
+
+enum SilhouetteHeightLabels {
+  one('1'),
+  two('2'),
+  three('3');
+
+  const SilhouetteHeightLabels(this.label);
 
   final String label;
 }
