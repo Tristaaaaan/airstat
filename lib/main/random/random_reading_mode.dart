@@ -1,3 +1,4 @@
+import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/main/random/random_reading_page.dart';
@@ -11,6 +12,7 @@ class RandomReadingMode extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Random"),
+        actions: const [AirstatSettingsAppBar()],
       ),
       body: const Center(
         child: Column(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
@@ -132,6 +133,7 @@ class ContinuosReadingData extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Continuous"),
+        actions: const [AirstatSettingsAppBar()],
       ),
       body: Column(
         children: [

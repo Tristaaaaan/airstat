@@ -1,3 +1,4 @@
+import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
@@ -79,57 +80,7 @@ class Settings extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        actions: const [
-          Row(
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "Sampling: ",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Sampling",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Delay: ",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Sampling",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 15,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Units: ",
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "Sampling",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 25,
-              ),
-            ],
-          )
-        ],
+        actions: [AirstatSettingsAppBar()],
       ),
       body: SingleChildScrollView(
         child: Column(
