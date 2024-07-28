@@ -1,3 +1,4 @@
+import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/container/menu_container.dart';
 import 'package:airstat/main/booth_page.dart';
 import 'package:airstat/main/continuous/continuous_main_page.dart';
@@ -52,6 +53,7 @@ class Home extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Airstat'),
+        actions: [AirstatSettingsAppBar()],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),

@@ -1,3 +1,4 @@
+import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
@@ -24,6 +25,7 @@ class ContinuousSaveData extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Continuous"),
+        actions: const [AirstatSettingsAppBar()],
       ),
       body: Center(
         child: Column(
