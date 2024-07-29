@@ -1,4 +1,5 @@
 import 'package:airstat/models/settings_model.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -54,8 +55,28 @@ class AirstatSettingsConfiguration {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAirstatSettingsDatabase() async {
+// Example function that returns a stream
+  Stream<AirstatSettingsModel> getAirstatSettingsStream() async* {
     final db = await airstatDb;
-    return await db.query('settings');
+
+    // Define a polling interval
+    const interval = Duration(seconds: 1);
+
+    while (true) {
+      // Fetch the latest settings from the database
+      final List<Map<String, dynamic>> maps = await db.query('settings');
+
+      if (maps.isNotEmpty) {
+        yield AirstatSettingsModel.fromMap(maps.first);
+      }
+
+      // Wait for the next poll
+      await Future.delayed(interval);
+    }
   }
 }
+
+final airstatSettingsProviderStream =
+    StreamProvider<AirstatSettingsModel>((ref) {
+  return AirstatSettingsConfiguration().getAirstatSettingsStream();
+});
