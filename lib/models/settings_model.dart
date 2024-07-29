@@ -1,3 +1,5 @@
+
+
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 class AirstatSettingsModel {
@@ -18,4 +20,13 @@ class AirstatSettingsModel {
       'unit': unit,
     };
   }
+
+  factory AirstatSettingsModel.fromMap(Map<String, dynamic> map) {
+    return AirstatSettingsModel(
+      delay: map['delay'] as int,
+      sampling: map['sampling'] as int,
+      unit: map['unit'] as String,
+    );
+  }
+
 }

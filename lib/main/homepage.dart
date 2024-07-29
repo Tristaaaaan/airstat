@@ -53,7 +53,7 @@ class Home extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Airstat'),
-        actions: [AirstatSettingsAppBar()],
+        actions: const [AirstatSettingsAppBar()],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),

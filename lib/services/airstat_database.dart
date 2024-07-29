@@ -54,8 +54,14 @@ class AirstatSettingsConfiguration {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAirstatSettingsDatabase() async {
+  Future<AirstatSettingsModel> getAirstatSettingsDatabase() async {
     final db = await airstatDb;
-    return await db.query('settings');
+    // Query the 'settings' table
+    final List<Map<String, dynamic>> maps = await db.query('settings');
+
+    // Check if there is at least one result
+
+    // Assuming you have a method to convert a map to AirstatSettingsModel
+    return AirstatSettingsModel.fromMap(maps.first);
   }
 }

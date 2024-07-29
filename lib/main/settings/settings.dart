@@ -3,45 +3,46 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/models/settings_model.dart';
+import 'package:airstat/provider/database_provider.dart';
 import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-const List<Widget> generalSampling = <Widget>[
-  Text('1'),
-  Text('2'),
-  Text('3'),
-  Text('4'),
-  Text('5')
+const List<String> generalSampling = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
 ];
 
-const List<Widget> silhoutteVentsSampling = <Widget>[
-  Text('1'),
-  Text('2'),
-  Text('3'),
-  Text('4'),
-  Text('5')
+const List<String> silhoutteVentsSampling = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
 ];
 
-const List<Widget> generalDelay = <Widget>[
-  Text('0'),
-  Text('2'),
-  Text('3'),
-  Text('4'),
-  Text('5')
+const List<String> generalDelay = [
+  '0',
+  '2',
+  '3',
+  '4',
+  '5',
 ];
 
-const List<Widget> silhoutteVentsDelay = <Widget>[
-  Text('0'),
-  Text('2'),
-  Text('3'),
-  Text('4'),
-  Text('5')
+const List<String> silhoutteVentsDelay = [
+  '0',
+  '2',
+  '3',
+  '4',
+  '5',
 ];
 
-const List<Widget> units = <Widget>[
-  Text('m/sec'),
-  Text('fit/min'),
+const List<String> units = [
+  'm/sec',
+  'ft/min',
 ];
 
 final generalSamplingProvider = StateProvider<List<bool>>((ref) {
@@ -64,6 +65,14 @@ final unitsProvider = StateProvider<List<bool>>((ref) {
   return [true, false];
 });
 
+final generalSamplingValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final generalDelayValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
 class Settings extends ConsumerWidget {
   const Settings({
     super.key,
@@ -71,16 +80,20 @@ class Settings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final airstatDatabase = ref.watch(airstatDatabaseProvider);
     final selectedGeneralSampling = ref.watch(generalSamplingProvider);
     final selectedSilhoutteVentsSampling =
         ref.watch(silhoutteVentsSamplingProvider);
     final selectedGeneralDelay = ref.watch(generalDelayProvider);
     final selectedSilhoutteVentsDelay = ref.watch(silhoutteVentsDelayProvider);
     final selectedUnits = ref.watch(unitsProvider);
+
+    final generalDelayValue = ref.watch(generalDelayValueProvider);
+    final generalSamplingValue = ref.watch(generalSamplingValueProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
-        actions: [AirstatSettingsAppBar()],
+        actions: const [AirstatSettingsAppBar()],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -102,6 +115,10 @@ class Settings extends ConsumerWidget {
                         selectedGeneralSampling.length,
                         (i) => i == index,
                       );
+
+                      ref.read(generalSamplingValueProvider.notifier).state =
+                          generalSampling[index];
+                      print('General Sampling: ${generalSampling[index]}');
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -113,7 +130,8 @@ class Settings extends ConsumerWidget {
                       minWidth: 63,
                     ),
                     isSelected: selectedGeneralSampling,
-                    children: generalSampling,
+                    children:
+                        generalSampling.map((value) => Text(value)).toList(),
                   ),
                 ],
               ),
@@ -135,6 +153,9 @@ class Settings extends ConsumerWidget {
                         selectedSilhoutteVentsSampling.length,
                         (i) => i == index,
                       );
+
+                      print(
+                          'Silhoutte / Vents Sampling: ${silhoutteVentsSampling[index]}');
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -146,7 +167,9 @@ class Settings extends ConsumerWidget {
                       minWidth: 63,
                     ),
                     isSelected: selectedSilhoutteVentsSampling,
-                    children: silhoutteVentsSampling,
+                    children: silhoutteVentsSampling
+                        .map((value) => Text(value))
+                        .toList(),
                   ),
                 ],
               ),
@@ -168,6 +191,10 @@ class Settings extends ConsumerWidget {
                         generalDelay.length,
                         (i) => i == index,
                       );
+
+                      ref.read(generalDelayValueProvider.notifier).state =
+                          generalDelay[index];
+                      print('General Delay: ${generalDelay[index]}');
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -179,7 +206,7 @@ class Settings extends ConsumerWidget {
                       minWidth: 63,
                     ),
                     isSelected: selectedGeneralDelay,
-                    children: generalDelay,
+                    children: generalDelay.map((value) => Text(value)).toList(),
                   ),
                 ],
               ),
@@ -212,7 +239,9 @@ class Settings extends ConsumerWidget {
                       minWidth: 63,
                     ),
                     isSelected: selectedSilhoutteVentsDelay,
-                    children: silhoutteVentsDelay,
+                    children: silhoutteVentsDelay
+                        .map((value) => Text(value))
+                        .toList(),
                   ),
                 ],
               ),
@@ -244,7 +273,7 @@ class Settings extends ConsumerWidget {
                       minWidth: 157.5,
                     ),
                     isSelected: selectedUnits,
-                    children: units,
+                    children: units.map((value) => Text(value)).toList(),
                   ),
                 ],
               ),
@@ -277,19 +306,19 @@ class Settings extends ConsumerWidget {
               width: 100,
               onTap: () async {
                 AirstatSettingsModel settings = AirstatSettingsModel(
-                  delay: 1,
-                  sampling: 20,
+                  delay: int.parse(generalDelayValue),
+                  sampling: int.parse(generalSamplingValue),
                   unit: "ft/min",
                 );
 
                 AirstatSettingsConfiguration config =
                     AirstatSettingsConfiguration();
                 final dataBefore = await config.getAirstatSettingsDatabase();
-                print("Before Settings: $dataBefore");
+                print("Before Settings: ${dataBefore.toMap()}");
                 await config.updateAirstatSettingsDatabase(settings);
 
                 final dataAfter = await config.getAirstatSettingsDatabase();
-                print("After Settings: $dataAfter");
+                print("After Settings: ${dataAfter.toMap()}");
               },
             ),
           ],
