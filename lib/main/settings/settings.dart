@@ -10,34 +10,34 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 const List<String> generalSampling = [
   '1',
-  '2',
-  '3',
-  '4',
   '5',
+  '10',
+  '15',
+  '20',
 ];
 
 const List<String> silhoutteVentsSampling = [
   '1',
-  '2',
-  '3',
-  '4',
   '5',
+  '10',
+  '15',
+  '20',
 ];
 
 const List<String> generalDelay = [
   '0',
-  '2',
-  '3',
-  '4',
   '5',
+  '10',
+  '15',
+  '20',
 ];
 
 const List<String> silhoutteVentsDelay = [
   '0',
-  '2',
-  '3',
-  '4',
   '5',
+  '10',
+  '15',
+  '20',
 ];
 
 const List<String> units = [
@@ -313,12 +313,12 @@ class Settings extends ConsumerWidget {
 
                 AirstatSettingsConfiguration config =
                     AirstatSettingsConfiguration();
-                final dataBefore = await config.getAirstatSettingsDatabase();
-                print("Before Settings: ${dataBefore.toMap()}");
+                // final dataBefore = await config.getAirstatSettingsDatabase();
+                // print("Before Settings: ${dataBefore.toMap()}");
                 await config.updateAirstatSettingsDatabase(settings);
 
-                final dataAfter = await config.getAirstatSettingsDatabase();
-                print("After Settings: ${dataAfter.toMap()}");
+                // final dataAfter = await config.getAirstatSettingsDatabase();
+                // print("After Settings: ${dataAfter.toMap()}");
               },
             ),
           ],
