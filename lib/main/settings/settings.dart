@@ -1,6 +1,7 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/settings_container_one.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/models/settings_model.dart';
 import 'package:airstat/provider/database_provider.dart';
@@ -73,6 +74,10 @@ final generalDelayValueProvider = StateProvider<String>((ref) {
   return "";
 });
 
+final unitValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
 class Settings extends ConsumerWidget {
   const Settings({
     super.key,
@@ -90,6 +95,7 @@ class Settings extends ConsumerWidget {
 
     final generalDelayValue = ref.watch(generalDelayValueProvider);
     final generalSamplingValue = ref.watch(generalSamplingValueProvider);
+    final unitValue = ref.watch(unitValueProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -262,6 +268,8 @@ class Settings extends ConsumerWidget {
                         units.length,
                         (i) => i == index,
                       );
+
+                      ref.read(unitValueProvider.notifier).state = units[index];
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -308,7 +316,7 @@ class Settings extends ConsumerWidget {
                 AirstatSettingsModel settings = AirstatSettingsModel(
                   delay: int.parse(generalDelayValue),
                   sampling: int.parse(generalSamplingValue),
-                  unit: "ft/min",
+                  unit: unitValue,
                 );
 
                 AirstatSettingsConfiguration config =
@@ -319,6 +327,11 @@ class Settings extends ConsumerWidget {
 
                 // final dataAfter = await config.getAirstatSettingsDatabase();
                 // print("After Settings: ${dataAfter.toMap()}");
+
+                if (context.mounted) {
+                  informationSnackBar(
+                      context, Icons.check, "Settings has been saved.");
+                }
               },
             ),
           ],

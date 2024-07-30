@@ -52,23 +52,27 @@ Future<String> readContinuousData(WidgetRef ref) async {
 
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
-
+// 'M1',
+    // 'U5',
+    // 'O1',
+    // 'L1',
+    // 'P1',
+    // 'B3',
+    // 'H1',
+    // 'NQ',
+    // 'F1',
+    // 'E3',
+    // 'T1',
+    // 'S4',
+    // 'C2',
+    // 'G0',
+    // 'K50',
     List<String> commands = [
-      'M1',
-      'U5',
-      'O1',
       'L1',
-      'P1',
-      'B3',
-      'H1',
-      'NQ',
-      'F1',
-      'E3',
-      'T1',
-      'S4',
-      'C2',
-      'G0',
-      'K50',
+      'M3',
+      'O1',
+      'P2',
+      'U5',
     ];
 
     for (String command in commands) {
