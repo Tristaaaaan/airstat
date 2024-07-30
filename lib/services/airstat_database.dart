@@ -37,6 +37,9 @@ class AirstatSettingsConfiguration {
   Future<void> createAirstatSettingsTable(Database database) async {
     await database.execute(
         'CREATE TABLE IF NOT EXISTS settings (delay INTEGER, sampling INTEGER, unit TEXT)');
+
+    // await database
+    //     .insert('settings', {'delay': 5, 'sampling': 10, 'unit': 'f/min'});
   }
 
   Future<void> insertAirstatSettingsDatabase(
