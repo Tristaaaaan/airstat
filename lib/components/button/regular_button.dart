@@ -23,7 +23,8 @@ class RegularButton extends StatelessWidget {
         child: Container(
           width: width,
           padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(color: backgroundColor),
+          decoration: BoxDecoration(
+              color: backgroundColor, borderRadius: BorderRadius.circular(8)),
           child: Text(
             buttonText,
             textAlign: TextAlign.center,

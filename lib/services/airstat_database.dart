@@ -38,8 +38,8 @@ class AirstatSettingsConfiguration {
     await database.execute(
         'CREATE TABLE IF NOT EXISTS settings (delay INTEGER, sampling INTEGER, unit TEXT)');
 
-    // await database
-    //     .insert('settings', {'delay': 5, 'sampling': 10, 'unit': 'f/min'});
+    await database
+        .insert('settings', {'delay': 5, 'sampling': 10, 'unit': 'f/min'});
   }
 
   Future<void> insertAirstatSettingsDatabase(
@@ -58,7 +58,16 @@ class AirstatSettingsConfiguration {
     );
   }
 
-// Example function that returns a stream
+  Future<AirstatSettingsModel> getAirstatSettingsDatabase() async {
+    final db = await airstatDb;
+    final maps = await db.query('settings');
+    if (maps.isNotEmpty) {
+      return AirstatSettingsModel.fromMap(maps.first);
+    } else {
+      return AirstatSettingsModel(delay: 5, sampling: 10, unit: 'f/min');
+    }
+  }
+
   Stream<AirstatSettingsModel> getAirstatSettingsStream() async* {
     final db = await airstatDb;
 

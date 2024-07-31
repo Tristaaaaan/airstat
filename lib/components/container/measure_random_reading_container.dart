@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 class MeasureReadingRandom extends StatelessWidget {
   final String label;
+  final String downDraft;
+  final String crossDraft;
   const MeasureReadingRandom({
     super.key,
     required this.label,
+    required this.downDraft,
+    required this.crossDraft,
   });
 
   @override
@@ -30,9 +34,9 @@ class MeasureReadingRandom extends StatelessWidget {
               const SizedBox(
                 width: 20,
               ),
-              const Text(
-                "--.-",
-                style: TextStyle(fontSize: 70),
+              Text(
+                downDraft.isNotEmpty ? downDraft : "--.-",
+                style: const TextStyle(fontSize: 70),
               ),
             ],
           ),
@@ -49,9 +53,9 @@ class MeasureReadingRandom extends StatelessWidget {
               const SizedBox(
                 width: 20,
               ),
-              const Text(
-                "--.-",
-                style: TextStyle(fontSize: 70),
+              Text(
+                crossDraft.isNotEmpty ? crossDraft : "--.-",
+                style: const TextStyle(fontSize: 70),
               )
             ],
           ),

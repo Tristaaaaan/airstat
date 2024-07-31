@@ -6,7 +6,11 @@ import 'package:airstat/main/files/file_page.dart';
 import 'package:airstat/main/random/random_reading_mode.dart';
 import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/main/three_d_page.dart';
+import 'package:airstat/models/settings_model.dart';
+import 'package:airstat/provider/configure_files_provider.dart';
+import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Home extends HookConsumerWidget {
@@ -49,6 +53,25 @@ class Home extends HookConsumerWidget {
     //   }
     //   return null;
     // }, [usbDevices]);
+
+    // Function to initialize USB devices
+    void initializeSettings() async {
+      final AirstatSettingsModel data =
+          await AirstatSettingsConfiguration().getAirstatSettingsDatabase();
+
+      ref.read(generalSamplingValueProvider.notifier).state =
+          data.sampling.toString();
+      ref.read(generalDelayValueProvider.notifier).state =
+          data.delay.toString();
+      ref.read(unitValueProvider.notifier).state = data.unit;
+
+      print("General Delay: ${ref.watch(generalDelayValueProvider)}");
+    }
+
+    useEffect(() {
+      initializeSettings();
+      return null;
+    }, []);
 
     return Scaffold(
       appBar: AppBar(
@@ -109,6 +132,8 @@ class Home extends HookConsumerWidget {
                           builder: (context) => const FilePage(),
                         ),
                       );
+
+                      ref.read(selectedFilesProvider.notifier).clearSelection();
                     },
                   ),
                   const MenuContainer(
@@ -126,7 +151,7 @@ class Home extends HookConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const RandomReadingMode(),
+                          builder: (context) => RandomReadingMode(),
                         ),
                       );
                     },

@@ -5,6 +5,7 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
 import 'package:airstat/main/continuous/continuous_save_data.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -257,7 +258,10 @@ class ContinuosReadingData extends ConsumerWidget {
                           await player.play(AssetSource('audios/beep-09.wav'),
                               volume: 1);
 
-                          await readContinuousData(ref);
+                          await readContinuousData(
+                            ref,
+                            ref.watch(unitValueProvider),
+                          );
 
                           if (context.mounted) {
                             informationSnackBar(context, Icons.info,

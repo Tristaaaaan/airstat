@@ -46,24 +46,27 @@ const List<String> units = [
   'ft/min',
 ];
 
-final generalSamplingProvider = StateProvider<List<bool>>((ref) {
-  return [true, false, false, false, false];
+final selectedGeneralSamplingProvider = StateProvider<List<bool>>((ref) {
+  final currentValue = ref.watch(generalSamplingValueProvider);
+  return generalSampling.map((value) => value == currentValue).toList();
 });
 
 final silhoutteVentsSamplingProvider = StateProvider<List<bool>>((ref) {
   return [true, false, false, false, false];
 });
 
-final generalDelayProvider = StateProvider<List<bool>>((ref) {
-  return [true, false, false, false, false];
+final selectedGeneralDelayProvider = StateProvider<List<bool>>((ref) {
+  final currentValue = ref.watch(generalDelayValueProvider);
+  return generalDelay.map((value) => value == currentValue).toList();
 });
 
 final silhoutteVentsDelayProvider = StateProvider<List<bool>>((ref) {
   return [true, false, false, false, false];
 });
 
-final unitsProvider = StateProvider<List<bool>>((ref) {
-  return [true, false];
+final selectedUnitProvider = StateProvider<List<bool>>((ref) {
+  final currentValue = ref.watch(unitValueProvider);
+  return units.map((value) => value == currentValue).toList();
 });
 
 final generalSamplingValueProvider = StateProvider<String>((ref) {
@@ -86,12 +89,12 @@ class Settings extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final airstatDatabase = ref.watch(airstatDatabaseProvider);
-    final selectedGeneralSampling = ref.watch(generalSamplingProvider);
+    final selectedGeneralSampling = ref.watch(selectedGeneralSamplingProvider);
     final selectedSilhoutteVentsSampling =
         ref.watch(silhoutteVentsSamplingProvider);
-    final selectedGeneralDelay = ref.watch(generalDelayProvider);
+    final selectedGeneralDelay = ref.watch(selectedGeneralDelayProvider);
     final selectedSilhoutteVentsDelay = ref.watch(silhoutteVentsDelayProvider);
-    final selectedUnits = ref.watch(unitsProvider);
+    final selectedUnits = ref.watch(selectedUnitProvider);
 
     final generalDelayValue = ref.watch(generalDelayValueProvider);
     final generalSamplingValue = ref.watch(generalSamplingValueProvider);
@@ -116,7 +119,7 @@ class Settings extends ConsumerWidget {
                   ToggleButtons(
                     direction: Axis.horizontal,
                     onPressed: (int index) {
-                      ref.read(generalSamplingProvider.notifier).state =
+                      ref.read(selectedGeneralSamplingProvider.notifier).state =
                           List.generate(
                         selectedGeneralSampling.length,
                         (i) => i == index,
@@ -192,7 +195,7 @@ class Settings extends ConsumerWidget {
                   ToggleButtons(
                     direction: Axis.horizontal,
                     onPressed: (int index) {
-                      ref.read(generalDelayProvider.notifier).state =
+                      ref.read(selectedGeneralDelayProvider.notifier).state =
                           List.generate(
                         generalDelay.length,
                         (i) => i == index,
@@ -264,7 +267,8 @@ class Settings extends ConsumerWidget {
                   ToggleButtons(
                     direction: Axis.horizontal,
                     onPressed: (int index) {
-                      ref.read(unitsProvider.notifier).state = List.generate(
+                      ref.read(selectedUnitProvider.notifier).state =
+                          List.generate(
                         units.length,
                         (i) => i == index,
                       );
