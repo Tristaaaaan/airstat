@@ -14,8 +14,16 @@ Future<void> stopContinuousData(WidgetRef ref) async {
 }
 
 // The function to read continuous data
-Future<String> readContinuousData(WidgetRef ref) async {
+Future<String> readContinuousData(WidgetRef ref, String unit) async {
   try {
+    String? unitValue;
+
+    if (unit == "f/min") {
+      unitValue = "U5";
+    } else {
+      unitValue = "U1";
+    }
+
     ref.read(isLoadingProvider.notifier).state = true;
     List<UsbDevice> serialList = await UsbSerial.listDevices();
     UsbPort? port = await serialList.first.create();
@@ -59,7 +67,7 @@ Future<String> readContinuousData(WidgetRef ref) async {
       'M3',
       'O1',
       'P2',
-      'U5',
+      unitValue,
     ];
 
     for (String command in commands) {
@@ -85,8 +93,18 @@ Future<String> readContinuousData(WidgetRef ref) async {
 }
 
 // The function to read continuous data
-Future<String> readRandomData(WidgetRef ref) async {
+Future<String> readRandomData(
+  WidgetRef ref,
+  String unit,
+) async {
   try {
+    String? unitValue;
+
+    if (unit == "f/min") {
+      unitValue = "U5";
+    } else {
+      unitValue = "U1";
+    }
     List<UsbDevice> serialList = await UsbSerial.listDevices();
     UsbPort? port = await serialList.first.create();
     if (await (port!.open()) != true) {
@@ -129,7 +147,7 @@ Future<String> readRandomData(WidgetRef ref) async {
       'M3',
       'O1',
       'P2',
-      'U5',
+      unitValue,
     ];
 
     for (String command in commands) {

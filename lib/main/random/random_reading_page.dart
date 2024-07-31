@@ -5,6 +5,7 @@ import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
 import 'package:airstat/main/continuous/continuous_reading_page.dart';
 import 'package:airstat/main/random/random_save_data.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -116,7 +117,10 @@ class RandomReadingPage extends ConsumerWidget {
 
                           serialData.clearData();
 
-                          await readRandomData(ref);
+                          await readRandomData(
+                            ref,
+                            ref.watch(unitValueProvider),
+                          );
 
                           if (context.mounted) {
                             informationSnackBar(

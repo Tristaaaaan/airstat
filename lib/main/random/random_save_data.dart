@@ -6,6 +6,7 @@ import 'package:airstat/dialog/confirmation_dialog.dart';
 import 'package:airstat/functions/request_data.dart';
 import 'package:airstat/main/continuous/continuous_reading_page.dart';
 import 'package:airstat/main/random/random_reading_page.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
@@ -106,13 +107,13 @@ class RandomSaveData extends ConsumerWidget {
                       final dataCount = ref.read(dataCountProvider.notifier);
                       await saveDataServices.writeContent(
                         fileNameController.text,
-                        'ft/min',
+                        ref.watch(unitValueProvider),
                         'random',
                         date,
                         date,
                         data.toString(),
-                        10.toString(),
-                        10.toString(),
+                        ref.watch(generalSamplingValueProvider),
+                        ref.watch(generalDelayValueProvider),
                         zoneId,
                       );
 
