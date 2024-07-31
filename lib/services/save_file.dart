@@ -11,14 +11,15 @@ import 'package:path_provider/path_provider.dart';
 class SaveFiles {
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
-    // For your reference print the AppDoc directory
-    print('Directory path: ${directory.path}');
+
     return directory.path;
   }
 
   Future<File> _localFile(String fileName) async {
     final path = await _localPath;
-    return File('$path/$fileName.csv'); // Corrected the file path construction
+    final DateTime now = DateTime.now();
+
+    return File('$path/$fileName-$now.csv');
   }
 
   Future<File?> writeContent(
@@ -36,11 +37,15 @@ class SaveFiles {
       final file = await _localFile(fileName);
       if (readingMode == 'continuous') {
         String csvContent =
-            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: continuous, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
-        // Write the file
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
+
+        return await file.writeAsString(csvContent);
+      } else if (readingMode == 'random') {
+        String csvContent =
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
+
         return await file.writeAsString(csvContent);
       } else {
-        // Return the file without writing if not in continuous mode
         return file;
       }
     } catch (e) {
