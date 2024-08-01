@@ -52,6 +52,7 @@ class RandomReadingPage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text("Serial Data: ${ref.watch(serialDataProvider)}"),
             randomReadingData.isNotEmpty
                 ? Expanded(
                     child: ListView.builder(

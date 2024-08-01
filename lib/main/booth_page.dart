@@ -115,21 +115,11 @@ class _BoothPage extends State<BoothPage> {
       await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
       await Future.delayed(Duration(seconds: 0.3.toInt()));
       List<String> commands = [
-        'M2',
-        'U5',
-        'O1',
         'L1',
-        'P1',
-        'B3',
-        'H1',
-        'NQ',
-        'F1',
-        'E3',
-        'T1',
-        'S4',
-        'C2',
-        'G0',
-        'K50',
+        'M3',
+        'O1',
+        'P2',
+        'U5',
       ];
 
       for (String command in commands) {
@@ -138,6 +128,7 @@ class _BoothPage extends State<BoothPage> {
       await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
 
       logs.add("Going back to measurement mode.");
+
       await Future.delayed(const Duration(seconds: 3));
       await port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
 
@@ -146,6 +137,11 @@ class _BoothPage extends State<BoothPage> {
       for (int i = 0; i < 3; i++) {
         await port!.write(Uint8List.fromList('Q'.codeUnits));
       }
+
+      await port!.write(Uint8List.fromList('????'.codeUnits));
+      await Future.delayed(const Duration(seconds: 1));
+      await port!.write(Uint8List.fromList('vvvvvvvvvv'.codeUnits));
+      await Future.delayed(const Duration(seconds: 1));
       setState(() {
         isLoading = false;
       });

@@ -63,11 +63,21 @@ Future<String> readContinuousData(WidgetRef ref, String unit) async {
     await Future.delayed(const Duration(milliseconds: 300));
 
     List<String> commands = [
-      'L1',
       'M3',
-      'O1',
-      'P2',
       unitValue,
+      'O1',
+      'L1',
+      'P1',
+      'B3',
+      'H1',
+      'NQ',
+      'F1',
+      'E3',
+      'T1',
+      'S4',
+      'C2',
+      'G0',
+      'K50',
     ];
 
     for (String command in commands) {
@@ -139,30 +149,45 @@ Future<String> readRandomData(
       getRandomData(ref);
     });
 
+// Enable polled mode
+    await port.write(Uint8List.fromList('?\r\n'.codeUnits));
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
 
     List<String> commands = [
-      'L1',
       'M3',
-      'O1',
-      'P2',
       unitValue,
+      'O1',
+      'L1',
+      'P1',
+      'B3',
+      'H1',
+      'NQ',
+      'F1',
+      'E3',
+      'T1',
+      'S4',
+      'C2',
+      'G0',
+      'K50',
     ];
 
     for (String command in commands) {
       await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
     }
 
-    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    await Future.delayed(const Duration(seconds: 3));
-    await port.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-    await Future.delayed(const Duration(seconds: 5));
+    // await Future.delayed(const Duration(seconds: 3));
+    // await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+    // await Future.delayed(const Duration(seconds: 3));
 
-    for (int i = 0; i < 3; i++) {
-      await port.write(Uint8List.fromList('Q'.codeUnits));
-    }
-    ref.read(subscriptionProvider.notifier).state?.cancel();
+    await port.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
+
+    // Enable polled mode
+    await port.write(Uint8List.fromList('vvvvv\r\n'.codeUnits));
+
     return "SUCCESS";
   } catch (e) {
     return Future.error(e);
