@@ -101,47 +101,57 @@ class _BoothPage extends State<BoothPage> {
     });
     logs.clear();
     serialData.clear();
+    StreamSubscription? subscription;
+    bool isConfigurationMode = false;
+
     try {
-      // TURN ON THE DEVICE
-      logs.add("Turning on the device.");
-      await port!.write(Uint8List.fromList('**'.codeUnits));
-      await Future.delayed(Duration(seconds: 0.3.toInt()));
-      await port!.write(Uint8List.fromList('**'.codeUnits));
       subscription = port!.inputStream!.listen((data) {
         onDataReceived(data);
+        if (logs.contains("CONFIGURATION MODE")) {
+          isConfigurationMode = true;
+        }
       });
 
-      logs.add("Entering Configuration Mode");
-      await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-      await Future.delayed(Duration(seconds: 0.3.toInt()));
-      List<String> commands = [
-        'L1',
-        'M3',
-        'O1',
-        'P2',
-        'U5',
-      ];
-
-      for (String command in commands) {
-        await port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
-      }
-      await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-
-      logs.add("Going back to measurement mode.");
-
-      await Future.delayed(const Duration(seconds: 3));
-      await port!.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-
-      await Future.delayed(const Duration(seconds: 5));
-
-      for (int i = 0; i < 3; i++) {
+      // Enter Configuration Mode
+      while (!isConfigurationMode) {
+        await port!.write(Uint8List.fromList('*'.codeUnits));
+        await Future.delayed(const Duration(milliseconds: 300));
         await port!.write(Uint8List.fromList('Q'.codeUnits));
+        await Future.delayed(const Duration(milliseconds: 300));
       }
 
-      await port!.write(Uint8List.fromList('????'.codeUnits));
-      await Future.delayed(const Duration(seconds: 1));
-      await port!.write(Uint8List.fromList('vvvvvvvvvv'.codeUnits));
-      await Future.delayed(const Duration(seconds: 1));
+      // await port!.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+      // await Future.delayed(const Duration(milliseconds: 300));
+      // List<String> commands = [
+      //   'L1',
+      //   'M3',
+      //   'O1',
+      //   'P2',
+      //   'U5',
+      // ];
+
+      // for (String command in commands) {
+      //   await port!.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+      //   await Future.delayed(const Duration(milliseconds: 300));
+      // }
+
+      await port!.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      await port!.write(Uint8List.fromList('?'.codeUnits));
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      await port!.write(Uint8List.fromList('&'.codeUnits));
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      await port!.write(Uint8List.fromList('Q'.codeUnits));
+
+      await port!.write(Uint8List.fromList('Q'.codeUnits));
+
+      await port!.write(Uint8List.fromList('Q'.codeUnits));
+
+      await port!.write(Uint8List.fromList('Q'.codeUnits));
+
       setState(() {
         isLoading = false;
       });
@@ -150,6 +160,8 @@ class _BoothPage extends State<BoothPage> {
       setState(() {
         isLoading = false;
       });
+    } finally {
+      await subscription?.cancel();
     }
   }
 

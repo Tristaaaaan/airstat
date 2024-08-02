@@ -125,39 +125,37 @@ class RandomReadingPage extends ConsumerWidget {
 
                           if (context.mounted) {
                             informationSnackBar(
-                                context, Icons.info, "Acquisition Started.");
+                                context, Icons.info, "Data has been acquired.");
 
                             reading.state = false;
                           }
-
-                          // Random random = Random();
-                          // String data =
-                          //     '[${random.nextInt(100)}, ${random.nextInt(100)}]';
-                          // ref.read(randomReadingDataHolder.notifier).addData(data);
-
-                          // print("Random Data: ${ref.watch(randomReadingDataHolder)}");
                         },
                 ),
                 const SizedBox(width: 10),
                 RegularButton(
-                    buttonText: "Save",
-                    textColor: randomReadingData.isEmpty
-                        ? Theme.of(context).colorScheme.inversePrimary
-                        : Theme.of(context).colorScheme.background,
-                    backgroundColor: randomReadingData.isEmpty
-                        ? Theme.of(context).colorScheme.secondary
-                        : Theme.of(context).colorScheme.primary,
-                    width: 100,
-                    onTap: randomReadingData.isEmpty
-                        ? () {}
-                        : () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return RandomSaveData(
-                                zoneId: zoneId,
-                              );
-                            }));
-                          }),
+                  buttonText: "Save",
+                  textColor: randomReadingData.isEmpty && isReading
+                      ? Theme.of(context).colorScheme.inversePrimary
+                      : Theme.of(context).colorScheme.background,
+                  backgroundColor: randomReadingData.isEmpty && isReading
+                      ? Theme.of(context).colorScheme.secondary
+                      : Theme.of(context).colorScheme.primary,
+                  width: 100,
+                  onTap: randomReadingData.isEmpty && isReading
+                      ? () {}
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return RandomSaveData(
+                                  zoneId: zoneId,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                ),
               ],
             ),
           ],

@@ -108,6 +108,7 @@ Future<String> readRandomData(
   String unit,
 ) async {
   try {
+    var subscriptions = ref.watch(subscriptionProvider);
     String? unitValue;
 
     if (unit == "f/min") {
@@ -132,8 +133,9 @@ Future<String> readRandomData(
     ); // Ensure these match your device's settings
     await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
 
+    bool isConfigurationMode = false;
+
     ref.read(serialDataProvider.notifier).clearData();
-    var subscriptions = ref.watch(subscriptionProvider);
 
     await port.write(Uint8List.fromList('**'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
@@ -145,52 +147,47 @@ Future<String> readRandomData(
 
       ref.read(serialDataProvider.notifier).addData(receivedMsg);
 
-      // Call getRandomData and check if data is valid
-      getRandomData(ref);
+      if (receivedMsg == "CONFIGURATION MODE") {
+        isConfigurationMode = true;
+      }
     });
-
-// Enable polled mode
-    await port.write(Uint8List.fromList('?\r\n'.codeUnits));
-
-    await Future.delayed(const Duration(milliseconds: 300));
+    // Enter Configuration Mode
+    while (!isConfigurationMode) {
+      await port.write(Uint8List.fromList('*'.codeUnits));
+      await Future.delayed(const Duration(milliseconds: 300));
+      await port.write(Uint8List.fromList('Q'.codeUnits));
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
 
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
 
-    List<String> commands = [
-      'M3',
-      unitValue,
-      'O1',
-      'L1',
-      'P1',
-      'B3',
-      'H1',
-      'NQ',
-      'F1',
-      'E3',
-      'T1',
-      'S4',
-      'C2',
-      'G0',
-      'K50',
-    ];
+    await port.write(Uint8List.fromList('\r\n$unitValue\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    for (String command in commands) {
-      await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
-    }
+    await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
+    await Future.delayed(const Duration(seconds: 1));
 
-    // await Future.delayed(const Duration(seconds: 3));
-    // await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    // await Future.delayed(const Duration(seconds: 3));
+    await port.write(Uint8List.fromList('?'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
+    await port.write(Uint8List.fromList('&'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    // Enable polled mode
-    await port.write(Uint8List.fromList('vvvvv\r\n'.codeUnits));
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    getRandomData(ref);
 
     return "SUCCESS";
   } catch (e) {
     return Future.error(e);
+  } finally {
+    ref.read(subscriptionProvider.notifier).state?.cancel();
   }
 }
 
@@ -221,8 +218,5 @@ void getRandomData(WidgetRef ref) {
 
     String data = '[$secondVal, $thirdVal]';
     ref.read(randomReadingDataHolder.notifier).addData(data);
-
-    // Cancel the subscription if data is valid
-    ref.read(subscriptionProvider.notifier).state?.cancel();
   }
 }
