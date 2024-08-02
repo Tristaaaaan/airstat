@@ -57,9 +57,8 @@ class RandomSaveData extends ConsumerWidget {
             Row(
               children: [
                 RegularButton(
+                  buttonKey: "randomDiscard",
                   buttonText: "Discard",
-                  textColor: Theme.of(context).colorScheme.background,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
                   width: 100,
                   onTap: () {
                     showDialog(
@@ -86,9 +85,8 @@ class RandomSaveData extends ConsumerWidget {
                   width: 10,
                 ),
                 RegularButton(
+                  buttonKey: "randomSave",
                   buttonText: "Save",
-                  textColor: Theme.of(context).colorScheme.background,
-                  backgroundColor: Theme.of(context).colorScheme.primary,
                   width: 100,
                   onTap: () async {
                     if (fileNameController.text.isEmpty) {

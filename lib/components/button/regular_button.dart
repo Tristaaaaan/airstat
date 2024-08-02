@@ -1,43 +1,49 @@
-import 'package:airstat/main/continuous/continuous_reading_page.dart';
+import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class RegularButton extends ConsumerWidget {
   final String buttonText;
   final void Function()? onTap;
-  final Color backgroundColor;
-  final Color textColor;
+
   final double? width;
+  final String buttonKey;
   const RegularButton({
     super.key,
     required this.buttonText,
     required this.onTap,
-    required this.backgroundColor,
-    required this.textColor,
     required this.width,
+    required this.buttonKey,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isReading = ref.watch(isReadingProvider);
+    final isLoading = ref.watch(isLoadingProvider)[buttonKey] ?? false;
     return InkWell(
-      onTap: isReading ? () {} : onTap,
+      onTap: isLoading ? () {} : onTap,
       child: IntrinsicHeight(
         child: Container(
           width: width,
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: !isLoading
+                ? Colors.grey
+                : Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: isReading
-              ? const CircularProgressIndicator()
+          child: isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.background),
+                )
               : Text(
                   buttonText,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
-                    color: textColor,
+                    color: isLoading
+                        ? Colors.grey
+                        : Theme.of(context).colorScheme.background,
                   ),
                 ),
         ),

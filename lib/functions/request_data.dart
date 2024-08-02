@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:airstat/main/continuous/continuous_reading_page.dart';
 import 'package:airstat/main/random/random_reading_page.dart';
+import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:airstat/provider/ports_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -15,6 +16,12 @@ Future<void> stopContinuousData(WidgetRef ref) async {
 
 // The function to read continuous data
 Future<String> readContinuousData(WidgetRef ref, String unit) async {
+  final isReading = ref.watch(isLoadingProvider).containsKey("continuousRead")
+      ? ref.watch(isLoadingProvider)["continuousRead"]
+      : false;
+  // print("Is Reading: $isReading");
+  // await Future.delayed(const Duration(seconds: 5));
+  // return "SUCCESS";
   try {
     String? unitValue;
 
@@ -24,7 +31,6 @@ Future<String> readContinuousData(WidgetRef ref, String unit) async {
       unitValue = "U1";
     }
 
-    ref.read(isLoadingProvider.notifier).state = true;
     List<UsbDevice> serialList = await UsbSerial.listDevices();
     UsbPort? port = await serialList.first.create();
     if (await (port!.open()) != true) {
@@ -47,8 +53,8 @@ Future<String> readContinuousData(WidgetRef ref, String unit) async {
 
     await port.write(Uint8List.fromList('**'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
-
     await port.write(Uint8List.fromList('**'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     subscriptions = port.inputStream!.listen((data) async {
       String receivedMsg = utf8.decode(data);
@@ -56,48 +62,51 @@ Future<String> readContinuousData(WidgetRef ref, String unit) async {
       ref.read(serialDataProvider.notifier).addData(receivedMsg);
     });
 
-    startTimer(ref);
     ref.read(subscriptionProvider.notifier).state = subscriptions;
-
-    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
 
     List<String> commands = [
       'M3',
-      unitValue,
-      'O1',
       'L1',
-      'P1',
-      'B3',
-      'H1',
-      'NQ',
-      'F1',
-      'E3',
-      'T1',
-      'S4',
-      'C2',
-      'G0',
-      'K50',
+      'O1',
+      'P2',
+      unitValue,
     ];
+
+    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     for (String command in commands) {
       await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
     }
 
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    await Future.delayed(const Duration(seconds: 3));
-    await port.write(Uint8List.fromList('Q\r\nQ\r\nQ\r\n'.codeUnits));
-    await Future.delayed(const Duration(seconds: 5));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-    for (int i = 0; i < 3; i++) {
-      await port.write(Uint8List.fromList('Q'.codeUnits));
+    await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await port.write(Uint8List.fromList('?'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await port.write(Uint8List.fromList('&'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    // await port.write(Uint8List.fromList('Q'.codeUnits));
+    // await Future.delayed(const Duration(milliseconds: 300));
+    startTimer(ref);
+    while (isReading!) {
+      await Future.delayed(
+        const Duration(seconds: 3),
+        () async {
+          await port.write(Uint8List.fromList('Q'.codeUnits));
+        },
+      );
     }
-
-    ref.read(isLoadingProvider.notifier).state = false;
 
     return "SUCCESS";
   } catch (e) {
-    ref.read(isLoadingProvider.notifier).state = false;
     return Future.error(e);
   }
 }
@@ -133,8 +142,6 @@ Future<String> readRandomData(
     ); // Ensure these match your device's settings
     await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
 
-    // bool isConfigurationMode = false;
-
     ref.read(serialDataProvider.notifier).clearData();
     await port.write(Uint8List.fromList('**'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
@@ -144,16 +151,10 @@ Future<String> readRandomData(
       String receivedMsg = utf8.decode(data);
 
       ref.read(serialDataProvider.notifier).addData(receivedMsg);
-
-      // if (receivedMsg == "CONFIGURATION MODE") {
-      //   isConfigurationMode = true;
-      // }
     });
-    // Enter Configuration Mode
-    // while (!isConfigurationMode) {
-    //   await port.write(Uint8List.fromList('Q'.codeUnits));
-    //   await Future.delayed(const Duration(milliseconds: 300));
-    // }
+
+    ref.read(subscriptionProvider.notifier).state = subscriptions;
+
     List<String> commands = [
       'M3',
       'L1',
@@ -183,8 +184,8 @@ Future<String> readRandomData(
 
     await port.write(Uint8List.fromList('Q'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
-    await port.write(Uint8List.fromList('Q'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+    // await port.write(Uint8List.fromList('Q'.codeUnits));
+    // await Future.delayed(const Duration(milliseconds: 300));
     await port.write(Uint8List.fromList('Q'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
 
@@ -227,3 +228,5 @@ void getRandomData(WidgetRef ref) {
     ref.read(randomReadingDataHolder.notifier).addData(data);
   }
 }
+
+void getContinuousDAta(WidgetRef ref) {}

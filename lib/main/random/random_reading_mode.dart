@@ -45,8 +45,7 @@ class RandomReadingMode extends ConsumerWidget {
             ),
             RegularButton(
                 buttonText: "Next",
-                textColor: Theme.of(context).colorScheme.background,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                buttonKey: "randomNext",
                 width: 100,
                 onTap: () {
                   if (zoneIdController.text.isNotEmpty) {

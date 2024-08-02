@@ -3,9 +3,9 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/container/measure_random_reading_container.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
-import 'package:airstat/main/continuous/continuous_reading_page.dart';
 import 'package:airstat/main/random/random_save_data.dart';
 import 'package:airstat/main/settings/settings.dart';
+import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +39,7 @@ class RandomReadingPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final randomReadingData = ref.watch(randomReadingDataHolder);
-    final isReading = ref.watch(isReadingProvider);
-    print("randomReadingData: $randomReadingData");
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Random"),
@@ -52,7 +51,6 @@ class RandomReadingPage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Serial Data: ${ref.watch(serialDataProvider)}"),
             randomReadingData.isNotEmpty
                 ? Expanded(
                     child: ListView.builder(
@@ -96,52 +94,39 @@ class RandomReadingPage extends ConsumerWidget {
             Row(
               children: [
                 RegularButton(
+                  buttonKey: "randomRead",
                   buttonText: "Read",
-                  textColor: randomReadingData.isEmpty
-                      ? Theme.of(context).colorScheme.inversePrimary
-                      : Theme.of(context).colorScheme.background,
-                  backgroundColor: randomReadingData.isEmpty
-                      ? Theme.of(context).colorScheme.secondary
-                      : Theme.of(context).colorScheme.primary,
                   width: 100,
-                  onTap: isReading
-                      ? () {}
-                      : () async {
-                          final reading = ref.read(isReadingProvider.notifier);
+                  onTap: () async {
+                    final reading = ref.read(isLoadingProvider.notifier);
 
-                          final serialData =
-                              ref.read(serialDataProvider.notifier);
-                          // ORIGINAL CODE
-                          reading.state = true;
-                          await player.play(AssetSource('audios/beep-09.wav'),
-                              volume: 1);
+                    final serialData = ref.read(serialDataProvider.notifier);
+                    // ORIGINAL CODE
+                    reading.setLoading("randomRead", true);
+                    await player.play(AssetSource('audios/beep-09.wav'),
+                        volume: 1);
 
-                          serialData.clearData();
+                    serialData.clearData();
 
-                          await readRandomData(
-                            ref,
-                            ref.watch(unitValueProvider),
-                          );
+                    await readRandomData(
+                      ref,
+                      ref.watch(unitValueProvider),
+                    );
 
-                          if (context.mounted) {
-                            informationSnackBar(
-                                context, Icons.info, "Data has been acquired.");
+                    if (context.mounted) {
+                      informationSnackBar(
+                          context, Icons.info, "Data has been acquired.");
 
-                            reading.state = false;
-                          }
-                        },
+                      reading.setLoading("randomRead", false);
+                    }
+                  },
                 ),
                 const SizedBox(width: 10),
                 RegularButton(
+                  buttonKey: "randomSave",
                   buttonText: "Save",
-                  textColor: randomReadingData.isEmpty && isReading
-                      ? Theme.of(context).colorScheme.inversePrimary
-                      : Theme.of(context).colorScheme.background,
-                  backgroundColor: randomReadingData.isEmpty && isReading
-                      ? Theme.of(context).colorScheme.secondary
-                      : Theme.of(context).colorScheme.primary,
                   width: 100,
-                  onTap: randomReadingData.isEmpty && isReading
+                  onTap: randomReadingData.isEmpty
                       ? () {}
                       : () {
                           Navigator.push(

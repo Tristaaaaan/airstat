@@ -42,18 +42,21 @@ class ContinuousReadingMode extends ConsumerWidget {
               height: 50,
             ),
             RegularButton(
+              buttonKey: "continuousNextButton",
               buttonText: "Next",
-              textColor: Theme.of(context).colorScheme.background,
-              backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () {
+                final serialDataNotifier =
+                    ref.read(serialDataProvider.notifier);
+                final toBeSavedDataNotifier =
+                    ref.read(toBeSavedDataProvider.notifier);
                 if (zoneIdController.text.isEmpty) {
                   informationSnackBar(context, Icons.warning,
                       "To proceed, kindly insert a zone ID");
                 } else {
-                  ref.read(serialDataProvider.notifier).clearData();
+                  serialDataNotifier.clearData();
 
-                  ref.read(toBeSavedDataProvider.notifier).clearData();
+                  toBeSavedDataNotifier.clearData();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
