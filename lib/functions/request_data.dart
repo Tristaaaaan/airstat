@@ -133,40 +133,47 @@ Future<String> readRandomData(
     ); // Ensure these match your device's settings
     await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
 
-    bool isConfigurationMode = false;
+    // bool isConfigurationMode = false;
 
     ref.read(serialDataProvider.notifier).clearData();
-
     await port.write(Uint8List.fromList('**'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
-
     await port.write(Uint8List.fromList('**'.codeUnits));
-
+    await Future.delayed(const Duration(milliseconds: 300));
     subscriptions = port.inputStream!.listen((data) async {
       String receivedMsg = utf8.decode(data);
 
       ref.read(serialDataProvider.notifier).addData(receivedMsg);
 
-      if (receivedMsg == "CONFIGURATION MODE") {
-        isConfigurationMode = true;
-      }
+      // if (receivedMsg == "CONFIGURATION MODE") {
+      //   isConfigurationMode = true;
+      // }
     });
     // Enter Configuration Mode
-    while (!isConfigurationMode) {
-      await port.write(Uint8List.fromList('*'.codeUnits));
-      await Future.delayed(const Duration(milliseconds: 300));
-      await port.write(Uint8List.fromList('Q'.codeUnits));
-      await Future.delayed(const Duration(milliseconds: 300));
+    // while (!isConfigurationMode) {
+    //   await port.write(Uint8List.fromList('Q'.codeUnits));
+    //   await Future.delayed(const Duration(milliseconds: 300));
+    // }
+    List<String> commands = [
+      'M3',
+      'L1',
+      'O1',
+      'P2',
+      unitValue,
+    ];
+
+    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    for (String command in commands) {
+      await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
     }
 
     await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('\r\n$unitValue\r\n'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
-
     await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 300));
 
     await port.write(Uint8List.fromList('?'.codeUnits));
     await Future.delayed(const Duration(milliseconds: 300));
