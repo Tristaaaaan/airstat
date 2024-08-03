@@ -1,7 +1,9 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
-import 'package:airstat/main/booth/booth_reading_page.dart';
-import 'package:airstat/main/booth/entrance_silhoutte_dynamic_table.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
+import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,6 +13,7 @@ class EntranceSilhouette extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final selectedEntranceSilhouette = ref.watch(selectedBoxProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Column(
@@ -71,7 +74,33 @@ class EntranceSilhouette extends ConsumerWidget {
                         .read(isLoadingProvider.notifier)
                         .setLoading("boothRead", true);
 
-                    await Future.delayed(const Duration(seconds: 5));
+                    final List<String> values =
+                        await readBoothData(ref, ref.watch(unitValueProvider));
+
+                    final selectedBox = ref.read(selectedBoxProvider);
+                    final row = selectedBox['selectedBox']['row'];
+                    final col = selectedBox['selectedBox']['col'];
+
+                    // Check if the selected cell already has a value
+                    if (row != null &&
+                        col != null &&
+                        ref
+                                .read(selectedBoxProvider.notifier)
+                                .getValue(row, col) !=
+                            null) {
+                      ref
+                          .read(isLoadingProvider.notifier)
+                          .setLoading("boothRead", false);
+                      if (context.mounted) {
+                        informationSnackBar(
+                            context, Icons.info, "Box already filled");
+                      }
+                      return; // Exit the function if the cell already has a value
+                    } else {
+                      ref
+                          .read(selectedBoxProvider.notifier)
+                          .updateSelectedBoxValue(values.toString());
+                    }
                     ref
                         .read(isLoadingProvider.notifier)
                         .setLoading("boothRead", false);
@@ -85,14 +114,20 @@ class EntranceSilhouette extends ConsumerWidget {
                   buttonKey: "boothNext",
                   width: 100,
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return const BoothReading();
-                        },
-                      ),
-                    );
+                    final allValues =
+                        ref.read(selectedBoxProvider.notifier).getAllValues();
+
+                    allValues.forEach((key, value) {
+                      print('Box $key: $value');
+                    });
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return const BoothReading();
+                    //     },
+                    //   ),
+                    // );
                   },
                 ),
               ],

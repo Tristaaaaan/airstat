@@ -1,7 +1,9 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/main/booth/entrance_silhouette_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 enum SiteLabels {
   cincinatti('Cincinatti');
@@ -35,11 +37,32 @@ enum ZoneLabels {
   final String label;
 }
 
-class BoothPage extends StatelessWidget {
+final siteValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final shopValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final lineValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final zoneValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+class BoothPage extends ConsumerWidget {
   const BoothPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final siteValue = ref.watch(siteValueProvider);
+    final shopValue = ref.watch(shopValueProvider);
+    final lineValue = ref.watch(lineValueProvider);
+    final zoneValue = ref.watch(zoneValueProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Booth"),
@@ -82,7 +105,12 @@ class BoothPage extends StatelessWidget {
                             }).toList(),
                             expandedInsets: const EdgeInsets.all(0),
                             onSelected: (value) {
-                              print(value!.label);
+                              ref.read(siteValueProvider.notifier).state =
+                                  value!.label;
+
+                              print(
+                                ref.watch(siteValueProvider),
+                              );
                             },
                           ),
                         ),
@@ -124,7 +152,12 @@ class BoothPage extends StatelessWidget {
                             }).toList(),
                             expandedInsets: const EdgeInsets.all(0),
                             onSelected: (value) {
-                              print(value!.label);
+                              ref.read(shopValueProvider.notifier).state =
+                                  value!.label;
+
+                              print(
+                                ref.watch(shopValueProvider),
+                              );
                             },
                           ),
                         ),
@@ -166,7 +199,12 @@ class BoothPage extends StatelessWidget {
                             }).toList(),
                             expandedInsets: const EdgeInsets.all(0),
                             onSelected: (value) {
-                              print(value!.label);
+                              ref.read(lineValueProvider.notifier).state =
+                                  value!.label;
+
+                              print(
+                                ref.watch(lineValueProvider),
+                              );
                             },
                           ),
                         ),
@@ -208,7 +246,12 @@ class BoothPage extends StatelessWidget {
                             }).toList(),
                             expandedInsets: const EdgeInsets.all(0),
                             onSelected: (value) {
-                              print(value!.label);
+                              ref.read(zoneValueProvider.notifier).state =
+                                  value!.label;
+
+                              print(
+                                ref.watch(zoneValueProvider),
+                              );
                             },
                           ),
                         ),
@@ -239,14 +282,22 @@ class BoothPage extends StatelessWidget {
               buttonKey: "boothNext",
               width: 100,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return const EntranceSilhouette();
-                    },
-                  ),
-                );
+                if (siteValue == "" ||
+                    shopValue == "" ||
+                    lineValue == "" ||
+                    zoneValue == "") {
+                  informationSnackBar(
+                      context, Icons.warning, "Please fill in all the fields");
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return const EntranceSilhouette();
+                      },
+                    ),
+                  );
+                }
               },
             ),
           ],

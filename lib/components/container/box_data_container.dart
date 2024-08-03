@@ -1,20 +1,46 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+// Provider for the SelectedBoxNotifier
+final selectedBoothReadingBoxProvider =
+    StateNotifierProvider<SelectedBoothReadingBoxNotifier, Map<String, int?>>(
+        (ref) {
+  return SelectedBoothReadingBoxNotifier();
+});
+
 // StateNotifier to manage selected box
-class SelectedBoxNotifier extends StateNotifier<Map<String, int?>> {
-  SelectedBoxNotifier() : super({'row': null, 'col': null});
+class SelectedBoothReadingBoxNotifier extends StateNotifier<Map<String, int?>> {
+  SelectedBoothReadingBoxNotifier() : super({'row': null, 'col': null});
+
+  void selectBox(int row, int col) {
+    state = {'row': row, 'col': col};
+  }
+
+  void updateSelectedBoxValue() {
+    final random = Random();
+    final newValue = (random.nextInt(100) + 1); // Generate a new random value
+    state = {'row': state['row'], 'col': state['col'], 'value': newValue};
+  }
+}
+
+// Provider for the SelectedBoxNotifier
+final selectedExitSilhouetteBoxProvider =
+    StateNotifierProvider<SelectedExitSilhouetteBoxNotifier, Map<String, int?>>(
+        (ref) {
+  return SelectedExitSilhouetteBoxNotifier();
+});
+
+// StateNotifier to manage selected box
+class SelectedExitSilhouetteBoxNotifier
+    extends StateNotifier<Map<String, int?>> {
+  SelectedExitSilhouetteBoxNotifier() : super({'row': null, 'col': null});
 
   void selectBox(int row, int col) {
     state = {'row': row, 'col': col};
   }
 }
-
-// Provider for the SelectedBoxNotifier
-final selectedBoxProvider =
-    StateNotifierProvider<SelectedBoxNotifier, Map<String, int?>>((ref) {
-  return SelectedBoxNotifier();
-});
 
 class BoxDataContainer extends StatelessWidget {
   final String value;

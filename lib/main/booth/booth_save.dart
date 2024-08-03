@@ -3,21 +3,16 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/dialog/confirmation_dialog.dart';
-import 'package:airstat/functions/request_data.dart';
-import 'package:airstat/main/continuous/continuous_reading_page.dart';
-import 'package:airstat/main/random/random_reading_page.dart';
+import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
-import 'package:airstat/provider/data_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class RandomSaveData extends ConsumerWidget {
-  final String zoneId;
-  const RandomSaveData({
+class BoothSaveData extends ConsumerWidget {
+  const BoothSaveData({
     super.key,
-    required this.zoneId,
   });
 
   @override
@@ -25,10 +20,9 @@ class RandomSaveData extends ConsumerWidget {
     final saveDataServices = ref.watch(saveDataServicesProvider);
     final TextEditingController fileNameController = TextEditingController();
 
-    final stopWatch = ref.watch(stopWatchTimerProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Random"),
+        title: const Text("Booth"),
         actions: const [AirstatSettingsAppBar()],
       ),
       body: Center(
@@ -50,14 +44,14 @@ class RandomSaveData extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset(
-              "assets/icons/Icon_continuous_orange.png",
+              "assets/icons/Special_DD.png",
               width: 50,
               height: 50,
             ),
             Row(
               children: [
                 RegularButton(
-                  buttonKey: "randomDiscard",
+                  buttonKey: "boothDiscard",
                   buttonText: "Discard",
                   width: 100,
                   onTap: () {
@@ -67,10 +61,6 @@ class RandomSaveData extends ConsumerWidget {
                         return ConfirmationDialog(
                           confirm: () async {
                             print("OKAY");
-                            ref
-                                .read(randomReadingDataHolder.notifier)
-                                .clearData();
-                            Navigator.of(context).pop();
                           },
                           content:
                               "By tapping \"Yes\", the current obtained data will be discarded.",
@@ -93,29 +83,26 @@ class RandomSaveData extends ConsumerWidget {
                       informationSnackBar(context, Icons.warning,
                           "Kindly enter the file name to proceed");
                     } else {
+                      print("SAVE DATA");
                       final date = DateTime.now();
-                      final data = ref.watch(toBeSavedDataProvider);
 
-                      // refs
+                      const data = '312123';
+                      // // refs
                       final fileList = ref.read(fileListProvider.notifier);
-                      final randomReading =
-                          ref.read(randomReadingDataHolder.notifier);
-                      final tobeSaved =
-                          ref.read(toBeSavedDataProvider.notifier);
-                      final dataCount = ref.read(dataCountProvider.notifier);
+
                       await saveDataServices.writeContent(
                         fileNameController.text,
                         ref.watch(unitValueProvider),
-                        'random',
+                        'booth',
                         date,
                         date,
                         data.toString(),
                         ref.watch(generalSamplingValueProvider),
                         ref.watch(generalDelayValueProvider),
-                        zoneId,
-                        "--.-",
-                        "--.-",
-                        "--.-",
+                        ref.watch(zoneValueProvider), // id4
+                        ref.watch(siteValueProvider), // id 1
+                        ref.watch(shopValueProvider), // id 2
+                        ref.watch(lineValueProvider), // id 3
                       );
 
                       // Refresh the file list after saving the new file
@@ -124,11 +111,11 @@ class RandomSaveData extends ConsumerWidget {
                             context, Icons.check, "File has been saved");
 
                         fileList.refresh();
-                        stopWatch.onResetTimer();
-                        tobeSaved.clearData();
-                        randomReading.clearData();
-                        fileNameController.text = "";
-                        dataCount.state = 0;
+
+                        // tobeSaved.clearData();
+                        // randomReading.clearData();
+                        // fileNameController.text = "";
+                        // dataCount.state = 0;
                         Navigator.pop(context);
                       }
                     }

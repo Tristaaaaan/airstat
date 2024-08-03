@@ -83,6 +83,9 @@ class ContinuousSaveData extends ConsumerWidget {
                     ref.watch(generalSamplingValueProvider),
                     ref.watch(generalDelayValueProvider),
                     zoneId,
+                    "--.-",
+                    "--.-",
+                    "--.-",
                   );
                   ref.read(serialDataProvider.notifier).clearData();
                   ref.read(toBeSavedDataProvider.notifier).clearData();

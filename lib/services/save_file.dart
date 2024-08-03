@@ -31,18 +31,32 @@ class SaveFiles {
     String data,
     String numSampling,
     String delay,
-    String zoneId,
+    String zoneId, // id 4
+    String site, // id 1
+    String shop, // id 2
+    String line, // id 3
   ) async {
     try {
       final file = await _localFile(fileName);
+
+      // CONTINUOUS
       if (readingMode == 'continuous') {
         String csvContent =
             '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
 
         return await file.writeAsString(csvContent);
+
+        // RANDOM
       } else if (readingMode == 'random') {
         String csvContent =
-            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: --.--, id2: --.--, id3: --.--, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: $site, id2: $shop, id3: $line, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
+
+        return await file.writeAsString(csvContent);
+
+        // BOOTH
+      } else if (readingMode == 'booth') {
+        String csvContent =
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: $site, id2: $shop, id3: $line, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: $data, notes: --.-''';
 
         return await file.writeAsString(csvContent);
       } else {

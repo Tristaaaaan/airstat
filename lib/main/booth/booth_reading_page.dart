@@ -1,5 +1,6 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
 import 'package:airstat/main/booth/exit_silhouette_page.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,38 @@ class BoothReading extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Booth",
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Booth",
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+            Text(
+              "Reading",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
         ),
         actions: const [
           AirstatSettingsAppBar(),
         ],
+      ),
+      body: const SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              BoothReadingDynamicTable(rows: 3, columns: 5),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(

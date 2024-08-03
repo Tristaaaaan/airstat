@@ -1,5 +1,7 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/main/booth/booth_save.dart';
+import 'package:airstat/main/booth/dynamictables/exit_silhoutte_dynamic_table.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -34,6 +36,17 @@ class ExitSilhouette extends ConsumerWidget {
         actions: const [
           AirstatSettingsAppBar(),
         ],
+      ),
+      body: const SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            children: [
+              ExitSilhouetteDynamicTable(rows: 3, columns: 3),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(
@@ -71,9 +84,14 @@ class ExitSilhouette extends ConsumerWidget {
                 ),
                 RegularButton(
                   buttonText: "Next",
-                  buttonKey: "boothNext",
+                  buttonKey: "exitSilhouetteNext",
                   width: 100,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const BoothSaveData();
+                    }));
+                  },
                 ),
               ],
             ),
