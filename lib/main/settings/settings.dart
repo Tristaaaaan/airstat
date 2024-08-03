@@ -313,8 +313,7 @@ class Settings extends ConsumerWidget {
             ),
             RegularButton(
               buttonText: "Save",
-              textColor: Theme.of(context).colorScheme.background,
-              backgroundColor: Theme.of(context).colorScheme.primary,
+              buttonKey: "saveButton",
               width: 100,
               onTap: () async {
                 AirstatSettingsModel settings = AirstatSettingsModel(

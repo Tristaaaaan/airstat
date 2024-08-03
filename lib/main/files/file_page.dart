@@ -154,8 +154,7 @@ class FilePage extends ConsumerWidget {
             Expanded(
               child: RegularButton(
                 buttonText: "Upload",
-                textColor: Theme.of(context).colorScheme.background,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                buttonKey: "uploadButton",
                 width: double.infinity,
                 onTap: () async {},
               ),
@@ -164,8 +163,7 @@ class FilePage extends ConsumerWidget {
             Expanded(
               child: RegularButton(
                 buttonText: "Open",
-                textColor: Theme.of(context).colorScheme.background,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                buttonKey: "openButton",
                 width: double.infinity,
                 onTap: () {
                   for (var filePath in selectedFileContent.keys) {
@@ -179,8 +177,7 @@ class FilePage extends ConsumerWidget {
             Expanded(
               child: RegularButton(
                 buttonText: "Delete",
-                textColor: Theme.of(context).colorScheme.background,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                buttonKey: "deleteButton",
                 width: double.infinity,
                 onTap: () {
                   ref
@@ -193,8 +190,7 @@ class FilePage extends ConsumerWidget {
             Expanded(
               child: RegularButton(
                 buttonText: "Export",
-                textColor: Theme.of(context).colorScheme.background,
-                backgroundColor: Theme.of(context).colorScheme.primary,
+                buttonKey: "exportButton",
                 width: double.infinity,
                 onTap: () async {
                   bool permission = await checkPermissionStatus();

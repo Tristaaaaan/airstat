@@ -40,7 +40,3 @@ class SaveDataNotifier extends StateNotifier<List<List<String>>> {
     state = [];
   }
 }
-
-final isLoadingProvider = StateProvider<bool>((ref) {
-  return false;
-});

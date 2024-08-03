@@ -52,16 +52,14 @@ class ContinuousSaveData extends ConsumerWidget {
               height: 50,
             ),
             RegularButton(
+              buttonKey: "continuousDiscard",
               buttonText: "Discard",
-              textColor: Theme.of(context).colorScheme.background,
-              backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () {},
             ),
             RegularButton(
+              buttonKey: "continuousSave",
               buttonText: "Save",
-              textColor: Theme.of(context).colorScheme.background,
-              backgroundColor: Theme.of(context).colorScheme.primary,
               width: 100,
               onTap: () async {
                 if (fileNameController.text.isEmpty && serialData.isNotEmpty) {
@@ -85,6 +83,9 @@ class ContinuousSaveData extends ConsumerWidget {
                     ref.watch(generalSamplingValueProvider),
                     ref.watch(generalDelayValueProvider),
                     zoneId,
+                    "--.-",
+                    "--.-",
+                    "--.-",
                   );
                   ref.read(serialDataProvider.notifier).clearData();
                   ref.read(toBeSavedDataProvider.notifier).clearData();

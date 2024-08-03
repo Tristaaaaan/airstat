@@ -6,6 +6,7 @@ import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
 import 'package:airstat/main/continuous/continuous_save_data.dart';
 import 'package:airstat/main/settings/settings.dart';
+import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:airstat/provider/data_provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +16,6 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 // Controls the StopWatchTimer package for each sensor
 final stopWatchTimerProvider = StateProvider<StopWatchTimer>((ref) {
   return StopWatchTimer();
-});
-
-final isReadingProvider = StateProvider<bool>((ref) {
-  return false;
 });
 
 final secondValueProvider = StateProvider<String>((ref) {
@@ -36,23 +33,20 @@ final timerProvider = StateProvider<Timer?>((ref) {
 void startTimer(
   WidgetRef ref,
 ) {
-  final stopWatch = ref.watch(stopWatchTimerProvider);
-  // Retrieve the current timer from the provider
   final currentTimer = ref.read(timerProvider);
 
   // Cancel the existing timer if it exists
   currentTimer?.cancel();
-  stopWatch.onResetTimer();
-  stopWatch.onStartTimer();
+
 // Create a new timer and store it in the provider
   ref.read(timerProvider.notifier).state = Timer.periodic(
-    const Duration(seconds: 5),
+    const Duration(seconds: 3),
     (timer) {
       final serialData = ref.watch(serialDataProvider).last;
 
       // Get the current time in seconds since the timer started
       final secondsElapsed =
-          timer.tick * 5; // Since the timer ticks every 5 seconds
+          timer.tick * 3; // Since the timer ticks every 5 seconds
 
       // Insert the time into the test data
       ref.read(serialDataProvider.notifier).addData(serialData);
@@ -129,173 +123,175 @@ class ContinuosReadingData extends ConsumerWidget {
     final serialData = ref.watch(serialDataProvider);
     final secondValue = ref.watch(secondValueProvider);
     final thirdValue = ref.watch(thirdValueProvider);
-    final isReading = ref.watch(isReadingProvider);
+
     final toBeSaved = ref.watch(toBeSavedDataProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Continuous"),
-        actions: const [AirstatSettingsAppBar()],
-      ),
-      body: Column(
-        children: [
-          IntrinsicHeight(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/icons/icon_dd1.png",
-                        width: 35,
-                        height: 35,
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Text(
-                        serialData.isEmpty ? "--.-" : secondValue,
-                        style: const TextStyle(fontSize: 100),
-                      )
-                    ],
+    return WillPopScope(
+      onWillPop: () async {
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Continuous"),
+          actions: const [AirstatSettingsAppBar()],
+        ),
+        body: Column(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/icons/icon_dd1.png",
+                          width: 35,
+                          height: 35,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          serialData.isEmpty ? "--.-" : secondValue,
+                          style: const TextStyle(fontSize: 100),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/icons/icon_cd1.png",
-                        width: 35,
-                        height: 35,
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Text(
-                        serialData.isEmpty ? "--.-" : thirdValue,
-                        style: const TextStyle(fontSize: 100),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            child: Center(
-              child: StreamBuilder<int>(
-                stream: stopWatchTimer.secondTime,
-                initialData: 0,
-                builder: (context, snap) {
-                  final value = snap.data;
-                  final displayTime = StopWatchTimer.getDisplayTime(value!);
-                  return Column(
-                    children: <Widget>[
-                      Text(
-                        displayTime,
-                        style: const TextStyle(
-                            fontSize: 60, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  );
-                },
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/icons/icon_cd1.png",
+                          width: 35,
+                          height: 35,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          serialData.isEmpty ? "--.-" : thirdValue,
+                          style: const TextStyle(fontSize: 100),
+                        )
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 15,
-          vertical: 5,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Image.asset(
-              "assets/icons/Icon_continuous_orange.png",
-              width: 50,
-              height: 50,
-            ),
-            Row(
-              children: [
-                RegularButton(
-                    buttonText: "Stop",
-                    textColor: Theme.of(context).colorScheme.background,
-                    backgroundColor: !isReading
-                        ? Colors.grey
-                        : Theme.of(context).colorScheme.primary,
-                    width: 100,
-                    onTap: !isReading
-                        ? () {}
-                        : () async {
-                            // ORIGINAL CODE
-                            ref.read(isReadingProvider.notifier).state = false;
-                            stopWatchTimer.onStopTimer();
-                            stopTimer(ref);
-                            await stopContinuousData(ref);
-
-                            if (context.mounted) {
-                              informationSnackBar(context, Icons.info,
-                                  "Data reading has stopped.");
-                            }
-                          }),
-                const SizedBox(width: 10),
-                RegularButton(
-                  buttonText: "Read",
-                  textColor: Theme.of(context).colorScheme.background,
-                  backgroundColor: isReading
-                      ? Colors.grey
-                      : Theme.of(context).colorScheme.primary,
-                  width: 100,
-                  onTap: isReading
-                      ? () {}
-                      : () async {
-                          // ORIGINAL CODE
-                          ref.read(isReadingProvider.notifier).state = true;
-                          await player.play(AssetSource('audios/beep-09.wav'),
-                              volume: 1);
-
-                          await readContinuousData(
-                            ref,
-                            ref.watch(unitValueProvider),
-                          );
-
-                          if (context.mounted) {
-                            informationSnackBar(context, Icons.info,
-                                "Data reading has been initialized.");
-                          }
-                        },
+            Expanded(
+              child: Center(
+                child: StreamBuilder<int>(
+                  stream: stopWatchTimer.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data;
+                    final displayTime = StopWatchTimer.getDisplayTime(value!);
+                    return Column(
+                      children: <Widget>[
+                        Text(
+                          displayTime,
+                          style: const TextStyle(
+                              fontSize: 60, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-                const SizedBox(width: 10),
-                RegularButton(
-                  buttonText: "Save",
-                  textColor: Theme.of(context).colorScheme.background,
-                  backgroundColor: toBeSaved.isEmpty && isReading
-                      ? Colors.grey
-                      : Theme.of(context).colorScheme.primary,
-                  width: 100,
-                  onTap: toBeSaved.isEmpty && isReading
-                      ? () {}
-                      : () {
-                          if (serialData.isNotEmpty) {
-                            stopTimer(ref);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ContinuousSaveData(
-                                  zoneId: zoneId,
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                ),
-              ],
+              ),
             ),
           ],
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 5,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Image.asset(
+                "assets/icons/Icon_continuous_orange.png",
+                width: 50,
+                height: 50,
+              ),
+              Row(
+                children: [
+                  RegularButton(
+                      buttonKey: "continuousStop",
+                      buttonText: "Stop",
+                      width: 100,
+                      onTap: () async {
+                        // ORIGINAL CODE
+                        ref
+                            .read(isLoadingProvider.notifier)
+                            .setLoading("continuousRead", false);
+                        stopWatchTimer.onStopTimer();
+                        stopTimer(ref);
+                        await stopContinuousData(ref);
+
+                        if (context.mounted) {
+                          informationSnackBar(
+                              context, Icons.info, "Data reading has stopped.");
+                        }
+                      }),
+                  const SizedBox(width: 10),
+                  RegularButton(
+                    buttonKey: "continuousRead",
+                    buttonText: "Read",
+                    width: 100,
+                    onTap: () async {
+                      // ORIGINAL CODE
+                      ref
+                          .read(isLoadingProvider.notifier)
+                          .setLoading("continuousRead", true);
+                      await player.play(AssetSource('audios/beep-09.wav'),
+                          volume: 1);
+                      stopWatchTimer.onResetTimer();
+                      stopWatchTimer.onStartTimer();
+                      await readContinuousData(
+                        ref,
+                        ref.watch(unitValueProvider),
+                      );
+
+                      if (context.mounted) {
+                        informationSnackBar(context, Icons.info,
+                            "Data reading has been initialized.");
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  RegularButton(
+                    buttonText: "Save",
+                    buttonKey: "continuousSave",
+                    width: 100,
+                    onTap: toBeSaved.isEmpty
+                        ? () {
+                            if (context.mounted) {
+                              informationSnackBar(context, Icons.info,
+                                  "There is no data to save.");
+                            }
+                          }
+                        : () {
+                            if (serialData.isNotEmpty) {
+                              stopTimer(ref);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ContinuousSaveData(
+                                    zoneId: zoneId,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
