@@ -38,6 +38,10 @@ class SelectedBoxNotifier extends StateNotifier<Map<String, dynamic>> {
   Map<String, String> getAllValues() {
     return Map<String, String>.from(state['values']);
   }
+
+  void clearValues() {
+    state = {...state, 'values': {}};
+  }
 }
 
 // Provider for the SelectedBoxNotifier

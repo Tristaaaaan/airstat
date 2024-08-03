@@ -1,7 +1,11 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
+import 'package:airstat/functions/request_data.dart';
 import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
+import 'package:airstat/main/booth/dynamictables/exit_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/booth/exit_silhouette_page.dart';
+import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -71,7 +75,34 @@ class BoothReading extends ConsumerWidget {
                         .read(isLoadingProvider.notifier)
                         .setLoading("boothRead", true);
 
-                    await Future.delayed(const Duration(seconds: 5));
+                    final List<String> values =
+                        await readBoothData(ref, ref.watch(unitValueProvider));
+
+                    final selectedBox =
+                        ref.read(selectedBoothReadingBoxProvider);
+                    final row = selectedBox['selectedBox']['row'];
+                    final col = selectedBox['selectedBox']['col'];
+
+                    // Check if the selected cell already has a value
+                    if (row != null &&
+                        col != null &&
+                        ref
+                                .read(selectedBoothReadingBoxProvider.notifier)
+                                .getValue(row, col) !=
+                            null) {
+                      ref
+                          .read(isLoadingProvider.notifier)
+                          .setLoading("boothRead", false);
+                      if (context.mounted) {
+                        informationSnackBar(
+                            context, Icons.info, "Box already filled");
+                      }
+                      return; // Exit the function if the cell already has a value
+                    } else {
+                      ref
+                          .read(selectedBoothReadingBoxProvider.notifier)
+                          .updateSelectedBoxValue(values.toString());
+                    }
                     ref
                         .read(isLoadingProvider.notifier)
                         .setLoading("boothRead", false);
@@ -85,6 +116,9 @@ class BoothReading extends ConsumerWidget {
                   buttonKey: "boothNext",
                   width: 100,
                   onTap: () {
+                    ref
+                        .read(selectedExitSilhouetteBoxProvider.notifier)
+                        .clearValues();
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -2,6 +2,8 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/booth/booth_reading_page.dart';
+import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
 import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
@@ -13,7 +15,6 @@ class EntranceSilhouette extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedEntranceSilhouette = ref.watch(selectedBoxProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Column(
@@ -116,18 +117,20 @@ class EntranceSilhouette extends ConsumerWidget {
                   onTap: () {
                     final allValues =
                         ref.read(selectedBoxProvider.notifier).getAllValues();
-
+                    ref
+                        .read(selectedBoothReadingBoxProvider.notifier)
+                        .clearValues();
                     allValues.forEach((key, value) {
                       print('Box $key: $value');
                     });
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return const BoothReading();
-                    //     },
-                    //   ),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const BoothReading();
+                        },
+                      ),
+                    );
                   },
                 ),
               ],

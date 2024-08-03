@@ -1,6 +1,7 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
+import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/booth/entrance_silhouette_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -289,6 +290,7 @@ class BoothPage extends ConsumerWidget {
                   informationSnackBar(
                       context, Icons.warning, "Please fill in all the fields");
                 } else {
+                  ref.read(selectedBoxProvider.notifier).clearValues();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
