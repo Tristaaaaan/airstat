@@ -1,6 +1,6 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/container/menu_container.dart';
-import 'package:airstat/main/booth_page.dart';
+import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/continuous/continuous_main_page.dart';
 import 'package:airstat/main/files/file_page.dart';
 import 'package:airstat/main/random/random_reading_mode.dart';

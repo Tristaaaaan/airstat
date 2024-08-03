@@ -19,96 +19,98 @@ Future<String> readContinuousData(WidgetRef ref, String unit) async {
   final isReading = ref.watch(isLoadingProvider).containsKey("continuousRead")
       ? ref.watch(isLoadingProvider)["continuousRead"]
       : false;
-  // print("Is Reading: $isReading");
-  // await Future.delayed(const Duration(seconds: 5));
-  // return "SUCCESS";
-  try {
-    String? unitValue;
+  print("Is Reading: $isReading");
+  await Future.delayed(const Duration(seconds: 5));
+  return "SUCCESS";
 
-    if (unit == "f/min") {
-      unitValue = "U5";
-    } else {
-      unitValue = "U1";
-    }
+  // REMOVE THE COMMENTS AFTER TESTING
+  // try {
+  //   String? unitValue;
 
-    List<UsbDevice> serialList = await UsbSerial.listDevices();
-    UsbPort? port = await serialList.first.create();
-    if (await (port!.open()) != true) {
-      return "FAILED";
-    }
+  //   if (unit == "f/min") {
+  //     unitValue = "U5";
+  //   } else {
+  //     unitValue = "U1";
+  //   }
 
-    port.setDTR(true);
-    port.setRTS(true);
+  //   List<UsbDevice> serialList = await UsbSerial.listDevices();
+  //   UsbPort? port = await serialList.first.create();
+  //   if (await (port!.open()) != true) {
+  //     return "FAILED";
+  //   }
 
-    await port.setPortParameters(
-      9600, // Check the correct baud rate for WindSonic 75
-      UsbPort.DATABITS_8,
-      UsbPort.STOPBITS_1,
-      UsbPort.PARITY_NONE,
-    ); // Ensure these match your device's settings
-    await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
+  //   port.setDTR(true);
+  //   port.setRTS(true);
 
-    ref.read(serialDataProvider.notifier).clearData();
-    var subscriptions = ref.watch(subscriptionProvider);
+  //   await port.setPortParameters(
+  //     9600, // Check the correct baud rate for WindSonic 75
+  //     UsbPort.DATABITS_8,
+  //     UsbPort.STOPBITS_1,
+  //     UsbPort.PARITY_NONE,
+  //   ); // Ensure these match your device's settings
+  //   await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
 
-    await port.write(Uint8List.fromList('**'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
-    await port.write(Uint8List.fromList('**'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   ref.read(serialDataProvider.notifier).clearData();
+  //   var subscriptions = ref.watch(subscriptionProvider);
 
-    subscriptions = port.inputStream!.listen((data) async {
-      String receivedMsg = utf8.decode(data);
+  //   await port.write(Uint8List.fromList('**'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //   await port.write(Uint8List.fromList('**'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-      ref.read(serialDataProvider.notifier).addData(receivedMsg);
-    });
+  //   subscriptions = port.inputStream!.listen((data) async {
+  //     String receivedMsg = utf8.decode(data);
 
-    ref.read(subscriptionProvider.notifier).state = subscriptions;
+  //     ref.read(serialDataProvider.notifier).addData(receivedMsg);
+  //   });
 
-    List<String> commands = [
-      'M3',
-      'L1',
-      'O1',
-      'P2',
-      unitValue,
-    ];
+  //   ref.read(subscriptionProvider.notifier).state = subscriptions;
 
-    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   List<String> commands = [
+  //     'M3',
+  //     'L1',
+  //     'O1',
+  //     'P2',
+  //     unitValue,
+  //   ];
 
-    for (String command in commands) {
-      await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
-    }
+  //   await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   for (String command in commands) {
+  //     await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+  //   }
 
-    await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('?'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('&'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
+  //   await port.write(Uint8List.fromList('?'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-    await port.write(Uint8List.fromList('Q'.codeUnits));
-    await Future.delayed(const Duration(milliseconds: 300));
-    // await port.write(Uint8List.fromList('Q'.codeUnits));
-    // await Future.delayed(const Duration(milliseconds: 300));
-    startTimer(ref);
-    while (isReading!) {
-      await Future.delayed(
-        const Duration(seconds: 3),
-        () async {
-          await port.write(Uint8List.fromList('Q'.codeUnits));
-        },
-      );
-    }
+  //   await port.write(Uint8List.fromList('&'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
 
-    return "SUCCESS";
-  } catch (e) {
-    return Future.error(e);
-  }
+  //   await port.write(Uint8List.fromList('Q'.codeUnits));
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //   // await port.write(Uint8List.fromList('Q'.codeUnits));
+  //   // await Future.delayed(const Duration(milliseconds: 300));
+  //   startTimer(ref);
+  //   while (isReading!) {
+  //     await Future.delayed(
+  //       const Duration(seconds: 3),
+  //       () async {
+  //         await port.write(Uint8List.fromList('Q'.codeUnits));
+  //       },
+  //     );
+  //   }
+
+  //   return "SUCCESS";
+  // } catch (e) {
+  //   return Future.error(e);
+  // }
 }
 
 // The function to read continuous data

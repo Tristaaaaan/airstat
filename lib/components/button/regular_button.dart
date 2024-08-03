@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class RegularButton extends ConsumerWidget {
   final String buttonText;
   final void Function()? onTap;
+  final bool? withLoading;
 
   final double? width;
   final String buttonKey;
@@ -14,6 +15,7 @@ class RegularButton extends ConsumerWidget {
     required this.onTap,
     required this.width,
     required this.buttonKey,
+    this.withLoading = false,
   });
 
   @override
@@ -26,9 +28,11 @@ class RegularButton extends ConsumerWidget {
           width: width,
           padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
-            color: !isLoading
-                ? Colors.grey
-                : Theme.of(context).colorScheme.primary,
+            color: !withLoading!
+                ? Theme.of(context).colorScheme.primary
+                : !isLoading
+                    ? Colors.grey
+                    : Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(8),
           ),
           child: isLoading
