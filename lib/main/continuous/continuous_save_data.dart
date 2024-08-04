@@ -86,6 +86,9 @@ class ContinuousSaveData extends ConsumerWidget {
                     "--.-",
                     "--.-",
                     "--.-",
+                    "--.-",
+                    "--.-",
+                    "--.-",
                   );
                   ref.read(serialDataProvider.notifier).clearData();
                   ref.read(toBeSavedDataProvider.notifier).clearData();

@@ -116,6 +116,9 @@ class RandomSaveData extends ConsumerWidget {
                         "--.-",
                         "--.-",
                         "--.-",
+                        "--.-",
+                        "--.-",
+                        "--.-",
                       );
 
                       // Refresh the file list after saving the new file

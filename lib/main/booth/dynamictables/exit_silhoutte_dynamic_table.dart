@@ -109,7 +109,7 @@ class ExitSilhouetteDynamicTable extends ConsumerWidget {
                 Container(
                   width: 50,
                   height: 50,
-                  margin: const EdgeInsets.all(5),
+                  margin: const EdgeInsets.all(10),
                   alignment: Alignment.center,
                   child: Text(
                     getYHeaderLabel(rowIndex),

@@ -62,20 +62,6 @@ class BoothReadingDynamicTable extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedBox = ref.watch(selectedBoothReadingBoxProvider);
 
-    // Function to get Y header label based on row index
-    String getYHeaderLabel(int index) {
-      switch (index) {
-        case 0:
-          return 'Top';
-        case 1:
-          return 'Middle';
-        case 2:
-          return 'Bottom';
-        default:
-          return '';
-      }
-    }
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       child: Column(
@@ -89,7 +75,7 @@ class BoothReadingDynamicTable extends ConsumerWidget {
                 return const SizedBox(width: 50); // Empty corner cell
               }
               return Container(
-                margin: const EdgeInsets.all(5),
+                margin: const EdgeInsets.all(10),
                 width: 50,
                 height: 50,
                 alignment: Alignment.center,
@@ -112,7 +98,7 @@ class BoothReadingDynamicTable extends ConsumerWidget {
                   margin: const EdgeInsets.all(5),
                   alignment: Alignment.center,
                   child: Text(
-                    getYHeaderLabel(rowIndex),
+                    '${rowIndex + 1}',
                   ),
                 ),
                 // Data columns
