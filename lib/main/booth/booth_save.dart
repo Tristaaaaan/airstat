@@ -92,7 +92,6 @@ class BoothSaveData extends ConsumerWidget {
                       print("SAVE DATA");
                       final date = DateTime.now();
 
-                      const data = '312123';
                       // // refs
                       final fileList = ref.read(fileListProvider.notifier);
 
@@ -102,7 +101,7 @@ class BoothSaveData extends ConsumerWidget {
                         'booth',
                         date,
                         date,
-                        data.toString(),
+                        '--.-',
                         ref.watch(generalSamplingValueProvider),
                         ref.watch(generalDelayValueProvider),
                         ref.watch(zoneValueProvider), // id4

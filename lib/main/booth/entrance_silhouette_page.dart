@@ -141,7 +141,7 @@ class EntranceSilhouette extends HookConsumerWidget {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              DynamicTable(rows: 2, columns: 2),
+              DynamicTable(rows: 3, columns: 3),
             ],
           ),
         ),

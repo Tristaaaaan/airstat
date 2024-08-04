@@ -119,7 +119,7 @@ class ExitSilhouette extends ConsumerWidget {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              ExitSilhouetteDynamicTable(rows: 1, columns: 1),
+              ExitSilhouetteDynamicTable(rows: 3, columns: 3),
             ],
           ),
         ),

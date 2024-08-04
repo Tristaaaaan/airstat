@@ -208,7 +208,7 @@ class BoothReading extends ConsumerWidget {
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              BoothReadingDynamicTable(rows: 2, columns: 2),
+              BoothReadingDynamicTable(rows: 5, columns: 5),
             ],
           ),
         ),
