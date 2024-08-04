@@ -4,6 +4,12 @@ import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/dialog/confirmation_dialog.dart';
 import 'package:airstat/main/booth/booth_page.dart';
+import 'package:airstat/main/booth/booth_reading_page.dart';
+import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
+import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
+import 'package:airstat/main/booth/dynamictables/exit_silhoutte_dynamic_table.dart';
+import 'package:airstat/main/booth/entrance_silhouette_page.dart';
+import 'package:airstat/main/booth/exit_silhouette_page.dart';
 import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
@@ -86,7 +92,6 @@ class BoothSaveData extends ConsumerWidget {
                       print("SAVE DATA");
                       final date = DateTime.now();
 
-                      const data = '312123';
                       // // refs
                       final fileList = ref.read(fileListProvider.notifier);
 
@@ -96,13 +101,22 @@ class BoothSaveData extends ConsumerWidget {
                         'booth',
                         date,
                         date,
-                        data.toString(),
+                        '--.-',
                         ref.watch(generalSamplingValueProvider),
                         ref.watch(generalDelayValueProvider),
                         ref.watch(zoneValueProvider), // id4
                         ref.watch(siteValueProvider), // id 1
                         ref.watch(shopValueProvider), // id 2
                         ref.watch(lineValueProvider), // id 3
+                        ref.watch(tableDataProvider).data.toString(),
+                        ref
+                            .watch(boothReadingTableDataProvider)
+                            .data
+                            .toString(),
+                        ref
+                            .watch(exitSilhouetteTableDataProvider)
+                            .data
+                            .toString(),
                       );
 
                       // Refresh the file list after saving the new file
@@ -112,10 +126,16 @@ class BoothSaveData extends ConsumerWidget {
 
                         fileList.refresh();
 
-                        // tobeSaved.clearData();
-                        // randomReading.clearData();
-                        // fileNameController.text = "";
-                        // dataCount.state = 0;
+                        ref.read(selectedBoxProvider.notifier).clearValues();
+                        ref
+                            .read(selectedBoothReadingBoxProvider.notifier)
+                            .clearValues();
+                        ref
+                            .read(selectedExitSilhouetteBoxProvider.notifier)
+                            .clearValues();
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        Navigator.pop(context);
                         Navigator.pop(context);
                       }
                     }

@@ -83,7 +83,6 @@ class FilePage extends ConsumerWidget {
                           ref
                               .read(fileContentProvider.notifier)
                               .setContent(filePath, fileContent);
-                          print(fileContent);
                         } else {
                           ref
                               .read(fileContentProvider.notifier)

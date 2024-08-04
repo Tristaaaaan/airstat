@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:airstat/main/continuous/continuous_reading_page.dart';
@@ -258,90 +257,90 @@ Future<List<String>> readBoothData(
   String unit,
 ) async {
   // ORIGINAL
-  // try {
-  //   var subscriptions = ref.watch(subscriptionProvider);
-  //   String? unitValue;
+  try {
+    var subscriptions = ref.watch(subscriptionProvider);
+    String? unitValue;
 
-  //   if (unit == "f/min") {
-  //     unitValue = "U5";
-  //   } else {
-  //     unitValue = "U1";
-  //   }
-  //   List<UsbDevice> serialList = await UsbSerial.listDevices();
-  //   UsbPort? port = await serialList.first.create();
-  //   if (await (port!.open()) != true) {
-  //     return ['--.-', '--.-'];
-  //   }
+    if (unit == "f/min") {
+      unitValue = "U5";
+    } else {
+      unitValue = "U1";
+    }
+    List<UsbDevice> serialList = await UsbSerial.listDevices();
+    UsbPort? port = await serialList.first.create();
+    if (await (port!.open()) != true) {
+      return ['--.-', '--.-'];
+    }
 
-  //   port.setDTR(true);
-  //   port.setRTS(true);
+    port.setDTR(true);
+    port.setRTS(true);
 
-  //   await port.setPortParameters(
-  //     9600, // Check the correct baud rate for WindSonic 75
-  //     UsbPort.DATABITS_8,
-  //     UsbPort.STOPBITS_1,
-  //     UsbPort.PARITY_NONE,
-  //   ); // Ensure these match your device's settings
-  //   await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
+    await port.setPortParameters(
+      9600, // Check the correct baud rate for WindSonic 75
+      UsbPort.DATABITS_8,
+      UsbPort.STOPBITS_1,
+      UsbPort.PARITY_NONE,
+    ); // Ensure these match your device's settings
+    await port.setFlowControl(UsbPort.FLOW_CONTROL_OFF);
 
-  //   ref.read(serialDataProvider.notifier).clearData();
-  //   await port.write(Uint8List.fromList('**'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //   await port.write(Uint8List.fromList('**'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //   subscriptions = port.inputStream!.listen((data) async {
-  //     String receivedMsg = utf8.decode(data);
+    ref.read(serialDataProvider.notifier).clearData();
+    await port.write(Uint8List.fromList('**'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('**'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    subscriptions = port.inputStream!.listen((data) async {
+      String receivedMsg = utf8.decode(data);
 
-  //     ref.read(serialDataProvider.notifier).addData(receivedMsg);
-  //   });
+      ref.read(serialDataProvider.notifier).addData(receivedMsg);
+    });
 
-  //   ref.read(subscriptionProvider.notifier).state = subscriptions;
+    ref.read(subscriptionProvider.notifier).state = subscriptions;
 
-  //   List<String> commands = [
-  //     'M3',
-  //     'L1',
-  //     'O1',
-  //     'P2',
-  //     unitValue,
-  //   ];
+    List<String> commands = [
+      'M3',
+      'L1',
+      'O1',
+      'P2',
+      unitValue,
+    ];
 
-  //   await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   for (String command in commands) {
-  //     await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
-  //   }
+    for (String command in commands) {
+      await port.write(Uint8List.fromList('\r\n$command\r\n'.codeUnits));
+    }
 
-  //   await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('\r\nD3\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('\r\nQ\r\n'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   await port.write(Uint8List.fromList('?'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('?'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   await port.write(Uint8List.fromList('&'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('&'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   await port.write(Uint8List.fromList('Q'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //   // await port.write(Uint8List.fromList('Q'.codeUnits));
-  //   // await Future.delayed(const Duration(milliseconds: 300));
-  //   await port.write(Uint8List.fromList('Q'.codeUnits));
-  //   await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
+    // await port.write(Uint8List.fromList('Q'.codeUnits));
+    // await Future.delayed(const Duration(milliseconds: 300));
+    await port.write(Uint8List.fromList('Q'.codeUnits));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-  //   final data = getBoothData(ref);
+    final data = getBoothData(ref);
 
-  //   return data;
-  // } catch (e) {
-  //   return Future.error(e);
-  // } finally {
-  //   ref.read(subscriptionProvider.notifier).state?.cancel();
-  // }
+    return data;
+  } catch (e) {
+    return Future.error(e);
+  } finally {
+    ref.read(subscriptionProvider.notifier).state?.cancel();
+  }
 
-  final random = Random();
-  final firstValue = (random.nextInt(100) + 1).toString();
-  final secondValue = (random.nextInt(100) + 1).toString();
-  return Future.value([firstValue, secondValue]);
+  // final random = Random();
+  // final firstValue = (random.nextInt(100) + 1).toString();
+  // final secondValue = (random.nextInt(100) + 1).toString();
+  // return Future.value([firstValue, secondValue]);
 }

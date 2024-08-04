@@ -87,7 +87,7 @@ class DynamicTable extends ConsumerWidget {
                 return const SizedBox(width: 50); // Empty corner cell
               }
               return Container(
-                margin: const EdgeInsets.all(5),
+                margin: const EdgeInsets.all(10),
                 width: 50,
                 height: 50,
                 alignment: Alignment.center,
