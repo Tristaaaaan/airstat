@@ -1,4 +1,4 @@
-import 'package:airstat/main/settings/space_definition.dart';
+import 'package:airstat/main/settings/space_definition_main.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -26,7 +26,7 @@ class SettingsContainerOne extends ConsumerWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return const SpaceDefinition();
+                    return SpaceDefinitionMain();
                   },
                 ),
               );
