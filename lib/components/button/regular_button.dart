@@ -6,7 +6,6 @@ class RegularButton extends ConsumerWidget {
   final String buttonText;
   final void Function()? onTap;
   final bool? withLoading;
-
   final double? width;
   final String buttonKey;
   const RegularButton({
