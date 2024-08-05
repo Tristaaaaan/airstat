@@ -11,7 +11,7 @@ class SpaceDefinition extends StatelessWidget {
         title: const Text("Space Definition"),
         centerTitle: true,
       ),
-      body: const AddSpaceDefinition(),
+      body: AddSpaceDefinition(),
       bottomNavigationBar: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,

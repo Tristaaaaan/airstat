@@ -2,7 +2,6 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/constants/dropdown_labels.dart';
-import 'package:airstat/provider/configure_files_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,11 +11,19 @@ final readingModeProvider = StateProvider<String?>((ref) {
 });
 
 class AddSpaceDefinition extends ConsumerWidget {
-  const AddSpaceDefinition({super.key});
+  AddSpaceDefinition({super.key});
 
+  // Text Controllers
+  // Booth
+  final TextEditingController boothSiteTextController = TextEditingController();
+  final TextEditingController boothAreaTextController = TextEditingController();
+  final TextEditingController boothFloorTextController =
+      TextEditingController();
+  final TextEditingController boothRoomTextController = TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final saveConfiguration = ref.watch(saveDataConfigurationServicesProvider);
+
     final readingMode = ref.watch(readingModeProvider);
     return Scaffold(
       appBar: AppBar(
@@ -63,10 +70,22 @@ class AddSpaceDefinition extends ConsumerWidget {
             if (readingMode == "Booth")
               Column(
                 children: [
-                  const RegularTextField(category: "Site"),
-                  const RegularTextField(category: "Shop / Area"),
-                  const RegularTextField(category: "Line / Floor"),
-                  const RegularTextField(category: "Zone / Room"),
+                  RegularTextField(
+                    category: "Site",
+                    controller: boothSiteTextController,
+                  ),
+                  RegularTextField(
+                    category: "Shop / Area",
+                    controller: boothAreaTextController,
+                  ),
+                  RegularTextField(
+                    category: "Line / Floor",
+                    controller: boothFloorTextController,
+                  ),
+                  RegularTextField(
+                    category: "Zone / Room",
+                    controller: boothRoomTextController,
+                  ),
                   Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -525,10 +544,14 @@ class AddSpaceDefinition extends ConsumerWidget {
             ),
             RegularButton(
               onTap: () async {
-                print("HAHAHAHA");
-                await saveConfiguration.writeConfigurationContent(
-                    "configuration", "HAHAHAA");
-                ref.read(fileListProvider.notifier).refresh();
+                print("Site: ${boothSiteTextController.text}");
+                print("Shop/Area: ${boothAreaTextController.text}");
+
+                print("Line/Floor: ${boothFloorTextController.text}");
+                print("Zone/Room: ${boothRoomTextController.text}");
+                // await saveConfiguration.writeConfigurationContent(
+                //     "configuration", "HAHAHAA");
+                // ref.read(fileListProvider.notifier).refresh();
               },
               width: 100,
               buttonKey: "saveNewSpaceDefinition",

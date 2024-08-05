@@ -39,7 +39,7 @@ class EditSpaceDefinition extends ConsumerWidget {
               onTap: () {
                 ref.read(readingModeProvider.notifier).state = null;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const AddSpaceDefinition();
+                  return AddSpaceDefinition();
                 }));
               },
               width: 100,
