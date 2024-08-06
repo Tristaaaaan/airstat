@@ -160,7 +160,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                               const SizedBox(
                                 width: 10,
                               ),
-                              const Text("1 to 12",
+                              const Text("1 to 20",
                                   style: TextStyle(fontSize: 20)),
                             ],
                           ),
@@ -546,7 +546,6 @@ class AddSpaceDefinition extends ConsumerWidget {
               onTap: () async {
                 print("Site: ${boothSiteTextController.text}");
                 print("Shop/Area: ${boothAreaTextController.text}");
-
                 print("Line/Floor: ${boothFloorTextController.text}");
                 print("Zone/Room: ${boothRoomTextController.text}");
                 // await saveConfiguration.writeConfigurationContent(
