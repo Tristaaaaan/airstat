@@ -1,6 +1,5 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
-import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/main/aii/anteroom.dart';
 import 'package:airstat/main/booth/booth_page.dart';
 import 'package:flutter/material.dart';
@@ -234,22 +233,22 @@ class AirborneInfectionIsolationPage extends ConsumerWidget {
               buttonKey: "boothNext",
               width: 100,
               onTap: () {
-                if (siteValue == "" ||
-                    shopValue == "" ||
-                    lineValue == "" ||
-                    zoneValue == "") {
-                  informationSnackBar(
-                      context, Icons.warning, "Please fill in all the fields");
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const Anteroom();
-                      },
-                    ),
-                  );
-                }
+                // if (siteValue == "" ||
+                //     shopValue == "" ||
+                //     lineValue == "" ||
+                //     zoneValue == "") {
+                //   informationSnackBar(
+                //       context, Icons.warning, "Please fill in all the fields");
+                // } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return const Anteroom();
+                    },
+                  ),
+                );
+                // }
               },
             ),
           ],

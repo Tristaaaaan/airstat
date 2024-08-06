@@ -1,11 +1,11 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
-import 'package:airstat/main/aii/patient_bed.dart';
+import 'package:airstat/main/aii/patient_room.dart';
 import 'package:flutter/material.dart';
 
-class Anteroom extends StatelessWidget {
-  const Anteroom({super.key});
+class PatientBed extends StatelessWidget {
+  const PatientBed({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,53 +16,8 @@ class Anteroom extends StatelessWidget {
           AirstatSettingsAppBar(),
         ],
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          const Text("Anteroom"),
-                          SizedBox(
-                            width: 210,
-                            height: 210,
-                            child: Stack(
-                              children: [
-                                Image.asset(
-                                  "assets/icons/anteroom_overlay.png",
-                                  width: 200,
-                                  height: 200,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text("Supply Vent"),
-                      Text("Exhaust Vent"),
-                    ],
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+      body: const Center(
+        child: Text("Patient Bed"),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(
@@ -101,7 +56,7 @@ class Anteroom extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) {
-                          return const PatientBed();
+                          return const PatientRoom();
                         },
                       ),
                     );
