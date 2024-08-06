@@ -1,5 +1,6 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/container/menu_container.dart';
+import 'package:airstat/main/aii/aii_page.dart';
 import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/continuous/continuous_main_page.dart';
 import 'package:airstat/main/files/file_page.dart';
@@ -136,9 +137,16 @@ class Home extends HookConsumerWidget {
                       ref.read(selectedFilesProvider.notifier).clearSelection();
                     },
                   ),
-                  const MenuContainer(
+                  MenuContainer(
                     image: 'assets/icons/Icon_IIR.png',
                     label: 'A.I.I.',
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const AirborneInfectionIsolationPage()));
+                    },
                   ),
                   const MenuContainer(
                     image: 'assets/icons/Icon_OR.png',
