@@ -1,4 +1,5 @@
 import 'package:airstat/models/space_definition_model.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -36,10 +37,11 @@ class SpaceDefinitionsDatabase {
   Future<void> createSpaceDefinitionsTable(Database database) async {
     await database.execute('''
       CREATE TABLE IF NOT EXISTS spaceDefinitions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         ID1 TEXT,
         ID2 TEXT,
         ID3 TEXT,
-        ID4 TEXT PRIMARY KEY,
+        ID4 TEXT,
         Units TEXT,
         Mode TEXT,
         Type TEXT,
@@ -105,4 +107,36 @@ class SpaceDefinitionsDatabase {
       whereArgs: [id4],
     );
   }
+
+  Stream<List<Configuration>> getAirstatSpaceDefinitionStream() async* {
+    final db = await spaceDefinitionDb;
+
+    // Define a polling interval
+    const interval = Duration(seconds: 1);
+
+    while (true) {
+      try {
+        // Fetch the latest settings from the database
+        final List<Map<String, dynamic>> maps =
+            await db.query('spaceDefinitions');
+
+        if (maps.isNotEmpty) {
+          yield maps.map((map) => Configuration.fromMap(map)).toList();
+        } else {
+          yield [];
+        }
+      } catch (e) {
+        print('Error fetching space definitions: $e');
+        yield [];
+      }
+
+      // Wait for the next poll
+      await Future.delayed(interval);
+    }
+  }
 }
+
+final airstatSpaceDefinitionProviderStream =
+    StreamProvider<List<Configuration>>((ref) {
+  return SpaceDefinitionsDatabase().getAirstatSpaceDefinitionStream();
+});

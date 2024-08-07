@@ -3,6 +3,8 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/constants/dropdown_labels.dart';
+import 'package:airstat/models/space_definition_model.dart';
+import 'package:airstat/provider/database_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -30,7 +32,7 @@ class AddSpaceDefinition extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final saveConfiguration = ref.watch(saveDataConfigurationServicesProvider);
-
+    final airstatSpaceDefinition = ref.watch(airstatSpaceDefinitionProvider);
     final readingMode = ref.watch(readingModeProvider);
 
     String? unit;
@@ -38,10 +40,6 @@ class AddSpaceDefinition extends ConsumerWidget {
     String? readingPerRow;
     String? silhouetteWidth;
     String? silhouetteHeight;
-    String? targetDd;
-    String? targetCd;
-    String? ddDelta;
-    String? cdDelta;
 
     return Scaffold(
       appBar: AppBar(
@@ -589,9 +587,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                       silhouetteWidth != null &&
                       silhouetteHeight != null &&
                       targetDdTextController.text.isNotEmpty &&
-                      targetCdTextController.text.isNotEmpty &&
-                      ddDeltaTextController.text.isNotEmpty &&
-                      cdDeltaTextController.text.isNotEmpty) {
+                      ddDeltaTextController.text.isNotEmpty) {
                     print("Site: ${boothSiteTextController.text}");
                     print("Shop/Area: ${boothAreaTextController.text}");
                     print("Line/Floor: ${boothFloorTextController.text}");
@@ -605,9 +601,59 @@ class AddSpaceDefinition extends ConsumerWidget {
                     print("Target CD: ${targetCdTextController.text}");
                     print("DD Delta: ${ddDeltaTextController.text}");
                     print("CD Delta: ${cdDeltaTextController.text}");
+
+                    Configuration addAirstatSpaceDefinition = Configuration(
+                      id1: boothSiteTextController.text,
+                      id2: boothAreaTextController.text,
+                      id3: boothFloorTextController.text,
+                      id4: boothRoomTextController.text,
+                      units: unit!,
+                      mode: ref.watch(readingModeProvider) as String,
+                      xRows: int.parse(rows!),
+                      yReadPerRow: int.parse(readingPerRow!),
+                      zSilWidth: int.parse(silhouetteWidth!),
+                      silHeight: int.parse(silhouetteHeight!),
+                      targetDd: int.parse(targetDdTextController.text),
+                      targetSide: targetCdTextController.text == ""
+                          ? null
+                          : int.parse(targetCdTextController.text),
+                      varDd: int.parse(ddDeltaTextController.text),
+                      varCd: cdDeltaTextController.text == ""
+                          ? null
+                          : int.parse(cdDeltaTextController.text),
+                    );
+
+                    airstatSpaceDefinition
+                        .insertConfiguration(addAirstatSpaceDefinition);
+                    final List<Configuration> values =
+                        await airstatSpaceDefinition.getAllConfigurations();
+
+                    for (final value in values) {
+                      print("Configuration: ${value.id4}");
+                    }
+
+                    if (context.mounted) {
+                      informationSnackBar(context, Icons.check,
+                          "Space definition has been saved");
+                      boothSiteTextController.text = "";
+                      boothAreaTextController.text = "";
+                      boothFloorTextController.text = "";
+                      boothRoomTextController.text = "";
+                      unit = null;
+                      rows = null;
+                      readingPerRow = null;
+                      silhouetteWidth = null;
+                      silhouetteHeight = null;
+                      targetDdTextController.text = "";
+                      targetCdTextController.text = "";
+                      ddDeltaTextController.text = "";
+                      cdDeltaTextController.text = "";
+                    }
                   } else {
-                    informationSnackBar(
-                        context, Icons.error, "Fill all fields");
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      informationSnackBar(
+                          context, Icons.error, "Fill all fields");
+                    });
                   }
                 }
 

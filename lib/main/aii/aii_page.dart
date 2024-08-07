@@ -21,50 +21,49 @@ class AirborneInfectionIsolationPage extends ConsumerWidget {
           AirstatSettingsAppBar(),
         ],
       ),
-      body: SingleChildScrollView(
+      body: const SingleChildScrollView(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               child: Column(
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Site",
                           style: TextStyle(fontSize: 20),
                         ),
-                        SizedBox(
-                          width: 315,
-                          child: DropdownMenu<SiteLabels>(
-                            dropdownMenuEntries: SiteLabels.values
-                                .map<DropdownMenuEntry<SiteLabels>>(
-                                    (SiteLabels content) {
-                              return DropdownMenuEntry<SiteLabels>(
-                                value: content,
-                                label: content.label,
-                                style: MenuItemButton.styleFrom(
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                ),
-                              );
-                            }).toList(),
-                            expandedInsets: const EdgeInsets.all(0),
-                            onSelected: (value) {
-                              ref.read(siteValueProvider.notifier).state =
-                                  value!.label;
+                        // SizedBox(
+                        //   width: 315,
+                        //   child: DropdownMenu<SiteLabels>(
+                        //     dropdownMenuEntries: SiteLabels.values
+                        //         .map<DropdownMenuEntry<SiteLabels>>(
+                        //             (SiteLabels content) {
+                        //       return DropdownMenuEntry<SiteLabels>(
+                        //         value: content,
+                        //         label: content.label,
+                        //         style: MenuItemButton.styleFrom(
+                        //           foregroundColor: Theme.of(context)
+                        //               .colorScheme
+                        //               .inversePrimary,
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //     expandedInsets: const EdgeInsets.all(0),
+                        //     onSelected: (value) {
+                        //       ref.read(siteValueProvider.notifier).state =
+                        //           value!.label;
 
-                              print(
-                                ref.watch(siteValueProvider),
-                              );
-                            },
-                          ),
-                        ),
+                        //       print(
+                        //         ref.watch(siteValueProvider),
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -72,46 +71,45 @@ class AirborneInfectionIsolationPage extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               child: Column(
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Shop",
                           style: TextStyle(fontSize: 20),
                         ),
-                        SizedBox(
-                          width: 315,
-                          child: DropdownMenu<ShopLabels>(
-                            dropdownMenuEntries: ShopLabels.values
-                                .map<DropdownMenuEntry<ShopLabels>>(
-                                    (ShopLabels content) {
-                              return DropdownMenuEntry<ShopLabels>(
-                                value: content,
-                                label: content.label,
-                                style: MenuItemButton.styleFrom(
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                ),
-                              );
-                            }).toList(),
-                            expandedInsets: const EdgeInsets.all(0),
-                            onSelected: (value) {
-                              ref.read(shopValueProvider.notifier).state =
-                                  value!.label;
+                        // SizedBox(
+                        //   width: 315,
+                        //   child: DropdownMenu<ShopLabels>(
+                        //     dropdownMenuEntries: ShopLabels.values
+                        //         .map<DropdownMenuEntry<ShopLabels>>(
+                        //             (ShopLabels content) {
+                        //       return DropdownMenuEntry<ShopLabels>(
+                        //         value: content,
+                        //         label: content.label,
+                        //         style: MenuItemButton.styleFrom(
+                        //           foregroundColor: Theme.of(context)
+                        //               .colorScheme
+                        //               .inversePrimary,
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //     expandedInsets: const EdgeInsets.all(0),
+                        //     onSelected: (value) {
+                        //       ref.read(shopValueProvider.notifier).state =
+                        //           value!.label;
 
-                              print(
-                                ref.watch(shopValueProvider),
-                              );
-                            },
-                          ),
-                        ),
+                        //       print(
+                        //         ref.watch(shopValueProvider),
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -119,46 +117,45 @@ class AirborneInfectionIsolationPage extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               child: Column(
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Line",
                           style: TextStyle(fontSize: 20),
                         ),
-                        SizedBox(
-                          width: 315,
-                          child: DropdownMenu<LineLabels>(
-                            dropdownMenuEntries: LineLabels.values
-                                .map<DropdownMenuEntry<LineLabels>>(
-                                    (LineLabels content) {
-                              return DropdownMenuEntry<LineLabels>(
-                                value: content,
-                                label: content.label,
-                                style: MenuItemButton.styleFrom(
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                ),
-                              );
-                            }).toList(),
-                            expandedInsets: const EdgeInsets.all(0),
-                            onSelected: (value) {
-                              ref.read(lineValueProvider.notifier).state =
-                                  value!.label;
+                        // SizedBox(
+                        //   width: 315,
+                        //   child: DropdownMenu<LineLabels>(
+                        //     dropdownMenuEntries: LineLabels.values
+                        //         .map<DropdownMenuEntry<LineLabels>>(
+                        //             (LineLabels content) {
+                        //       return DropdownMenuEntry<LineLabels>(
+                        //         value: content,
+                        //         label: content.label,
+                        //         style: MenuItemButton.styleFrom(
+                        //           foregroundColor: Theme.of(context)
+                        //               .colorScheme
+                        //               .inversePrimary,
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //     expandedInsets: const EdgeInsets.all(0),
+                        //     onSelected: (value) {
+                        //       ref.read(lineValueProvider.notifier).state =
+                        //           value!.label;
 
-                              print(
-                                ref.watch(lineValueProvider),
-                              );
-                            },
-                          ),
-                        ),
+                        //       print(
+                        //         ref.watch(lineValueProvider),
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -166,46 +163,45 @@ class AirborneInfectionIsolationPage extends ConsumerWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
               child: Column(
                 children: [
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           "Zone",
                           style: TextStyle(fontSize: 20),
                         ),
-                        SizedBox(
-                          width: 315,
-                          child: DropdownMenu<ZoneLabels>(
-                            dropdownMenuEntries: ZoneLabels.values
-                                .map<DropdownMenuEntry<ZoneLabels>>(
-                                    (ZoneLabels content) {
-                              return DropdownMenuEntry<ZoneLabels>(
-                                value: content,
-                                label: content.label,
-                                style: MenuItemButton.styleFrom(
-                                  foregroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .inversePrimary,
-                                ),
-                              );
-                            }).toList(),
-                            expandedInsets: const EdgeInsets.all(0),
-                            onSelected: (value) {
-                              ref.read(zoneValueProvider.notifier).state =
-                                  value!.label;
+                        // SizedBox(
+                        //   width: 315,
+                        //   child: DropdownMenu<ZoneLabels>(
+                        //     dropdownMenuEntries: ZoneLabels.values
+                        //         .map<DropdownMenuEntry<ZoneLabels>>(
+                        //             (ZoneLabels content) {
+                        //       return DropdownMenuEntry<ZoneLabels>(
+                        //         value: content,
+                        //         label: content.label,
+                        //         style: MenuItemButton.styleFrom(
+                        //           foregroundColor: Theme.of(context)
+                        //               .colorScheme
+                        //               .inversePrimary,
+                        //         ),
+                        //       );
+                        //     }).toList(),
+                        //     expandedInsets: const EdgeInsets.all(0),
+                        //     onSelected: (value) {
+                        //       ref.read(zoneValueProvider.notifier).state =
+                        //           value!.label;
 
-                              print(
-                                ref.watch(zoneValueProvider),
-                              );
-                            },
-                          ),
-                        ),
+                        //       print(
+                        //         ref.watch(zoneValueProvider),
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

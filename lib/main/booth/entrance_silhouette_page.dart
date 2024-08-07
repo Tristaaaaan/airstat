@@ -2,6 +2,7 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/booth/booth_reading_page.dart';
 import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
 import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
@@ -135,13 +136,15 @@ class EntranceSilhouette extends HookConsumerWidget {
           AirstatSettingsAppBar(),
         ],
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              DynamicTable(rows: 3, columns: 3),
+              DynamicTable(
+                  rows: ref.watch(boothSilhouetteHeightProvider),
+                  columns: ref.watch(boothSilhouetteWidthProvider)),
             ],
           ),
         ),

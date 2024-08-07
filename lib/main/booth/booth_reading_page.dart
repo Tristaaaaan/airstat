@@ -2,6 +2,7 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/booth/dynamictables/booth_reading_dynamic_table.dart';
 import 'package:airstat/main/booth/dynamictables/exit_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/booth/entrance_silhouette_page.dart';
@@ -278,13 +279,15 @@ class BoothReading extends ConsumerWidget {
           AirstatSettingsAppBar(),
         ],
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              BoothReadingDynamicTable(rows: 20, columns: 9),
+              BoothReadingDynamicTable(
+                  rows: ref.watch(boothRowsProvider),
+                  columns: ref.watch(boothColumnsProvider)),
             ],
           ),
         ),
