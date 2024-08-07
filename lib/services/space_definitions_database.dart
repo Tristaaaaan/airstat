@@ -1,0 +1,108 @@
+import 'package:airstat/models/space_definition_model.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+class SpaceDefinitionsDatabase {
+  Database? _spaceDefinitionDataBase;
+
+  Future<Database> get spaceDefinitionDb async {
+    if (_spaceDefinitionDataBase != null) {
+      return _spaceDefinitionDataBase!;
+    }
+    _spaceDefinitionDataBase = await initializeDatabase();
+    return _spaceDefinitionDataBase!;
+  }
+
+  Future<String> get localPath async {
+    const name = 'space_definitions.db';
+    final path = await getDatabasesPath();
+    return join(path, name);
+  }
+
+  Future<Database> initializeDatabase() async {
+    final path = await localPath;
+
+    // Delete the existing database file during development
+    // await deleteDatabase(path);
+
+    return await openDatabase(path,
+        version: 1, onCreate: create, singleInstance: true);
+  }
+
+  Future<void> create(Database db, int version) async {
+    await createSpaceDefinitionsTable(db);
+  }
+
+  Future<void> createSpaceDefinitionsTable(Database database) async {
+    await database.execute('''
+      CREATE TABLE IF NOT EXISTS spaceDefinitions (
+        ID1 TEXT,
+        ID2 TEXT,
+        ID3 TEXT,
+        ID4 TEXT PRIMARY KEY,
+        Units TEXT,
+        Mode TEXT,
+        Type TEXT,
+        X_Rows INTEGER,
+        Y_ReadPerRow INTEGER,
+        Z_Sil_Width INTEGER,
+        Sil_Height INTEGER,
+        Target_DD INTEGER,
+        Target_side INTEGER,
+        Var_DD INTEGER,
+        Var_CD INTEGER,
+        tbd1 INTEGER,
+        tbd2 INTEGER
+      )
+    ''');
+  }
+
+  Future<int> insertConfiguration(Configuration config) async {
+    final db = await spaceDefinitionDb;
+    return await db.insert('spaceDefinitions', config.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<List<Configuration>> getAllConfigurations() async {
+    final db = await spaceDefinitionDb;
+    final List<Map<String, dynamic>> maps = await db.query('spaceDefinitions');
+
+    return List.generate(maps.length, (i) {
+      return Configuration.fromMap(maps[i]);
+    });
+  }
+
+  Future<Configuration?> getConfiguration(String id4) async {
+    final db = await spaceDefinitionDb;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'spaceDefinitions',
+      where: 'ID4 = ?',
+      whereArgs: [id4],
+    );
+
+    if (maps.isNotEmpty) {
+      return Configuration.fromMap(maps.first);
+    } else {
+      return null;
+    }
+  }
+
+  Future<int> updateConfiguration(Configuration config) async {
+    final db = await spaceDefinitionDb;
+    return await db.update(
+      'spaceDefinitions',
+      config.toMap(),
+      where: 'ID4 = ?',
+      whereArgs: [config.id4],
+    );
+  }
+
+  Future<int> deleteConfiguration(String id4) async {
+    final db = await spaceDefinitionDb;
+    return await db.delete(
+      'spaceDefinitions',
+      where: 'ID4 = ?',
+      whereArgs: [id4],
+    );
+  }
+}

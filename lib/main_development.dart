@@ -1,5 +1,6 @@
 import 'package:airstat/main/homepage.dart';
 import 'package:airstat/services/airstat_database.dart';
+import 'package:airstat/services/space_definitions_database.dart';
 import 'package:airstat/themes/lightmode/light_mode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +9,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AirstatSettingsConfiguration().initializeDatabase();
-
+  await SpaceDefinitionsDatabase().initializeDatabase();
   runApp(const ProviderScope(child: MainApp()));
 }
 

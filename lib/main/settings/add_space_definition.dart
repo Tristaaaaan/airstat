@@ -1,5 +1,6 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/constants/dropdown_labels.dart';
 import 'package:airstat/provider/save_data_provider.dart';
@@ -20,11 +21,28 @@ class AddSpaceDefinition extends ConsumerWidget {
   final TextEditingController boothFloorTextController =
       TextEditingController();
   final TextEditingController boothRoomTextController = TextEditingController();
+  final TextEditingController targetDdTextController = TextEditingController();
+  final TextEditingController targetCdTextController = TextEditingController();
+
+  final TextEditingController ddDeltaTextController = TextEditingController();
+  final TextEditingController cdDeltaTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final saveConfiguration = ref.watch(saveDataConfigurationServicesProvider);
 
     final readingMode = ref.watch(readingModeProvider);
+
+    String? unit;
+    String? rows;
+    String? readingPerRow;
+    String? silhouetteWidth;
+    String? silhouetteHeight;
+    String? targetDd;
+    String? targetCd;
+    String? ddDelta;
+    String? cdDelta;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Space Definition"),
@@ -114,7 +132,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                             }).toList(),
                             expandedInsets: const EdgeInsets.all(0),
                             onSelected: (value) {
-                              print(value!.label);
+                              unit = value!.label;
                             },
                           ),
                         ),
@@ -153,7 +171,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                                   }).toList(),
                                   expandedInsets: const EdgeInsets.all(0),
                                   onSelected: (value) {
-                                    print(value!.label);
+                                    rows = value!.label;
                                   },
                                 ),
                               ),
@@ -203,7 +221,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                                   }).toList(),
                                   expandedInsets: const EdgeInsets.all(0),
                                   onSelected: (value) {
-                                    print(value!.label);
+                                    readingPerRow = value!.label;
                                   },
                                 ),
                               ),
@@ -253,7 +271,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                                   }).toList(),
                                   expandedInsets: const EdgeInsets.all(0),
                                   onSelected: (value) {
-                                    print(value!.label);
+                                    silhouetteWidth = value!.label;
                                   },
                                 ),
                               ),
@@ -303,7 +321,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                                   }).toList(),
                                   expandedInsets: const EdgeInsets.all(0),
                                   onSelected: (value) {
-                                    print(value!.label);
+                                    silhouetteHeight = value!.label;
                                   },
                                 ),
                               ),
@@ -318,11 +336,26 @@ class AddSpaceDefinition extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  const RegularTextField(category: "Target DD"),
-                  const RegularTextField(category: "DD Delta"),
-                  const RegularTextField(category: "Target Delta"),
-                  const RegularTextField(category: "Target CD"),
-                  const RegularTextField(category: "CD Delta"),
+                  RegularTextField(
+                    category: "Target DD",
+                    controller: targetDdTextController,
+                    number: true,
+                  ),
+                  RegularTextField(
+                    category: "Target CD",
+                    controller: targetCdTextController,
+                    number: true,
+                  ),
+                  RegularTextField(
+                    category: "DD Delta",
+                    controller: ddDeltaTextController,
+                    number: true,
+                  ),
+                  RegularTextField(
+                    category: "CD Delta",
+                    controller: cdDeltaTextController,
+                    number: true,
+                  ),
                 ],
               ),
             if (readingMode == "OR" || readingMode == "All")
@@ -544,10 +577,40 @@ class AddSpaceDefinition extends ConsumerWidget {
             ),
             RegularButton(
               onTap: () async {
-                print("Site: ${boothSiteTextController.text}");
-                print("Shop/Area: ${boothAreaTextController.text}");
-                print("Line/Floor: ${boothFloorTextController.text}");
-                print("Zone/Room: ${boothRoomTextController.text}");
+                if (ref.watch(readingModeProvider) == "Booth") {
+                  print("Booth");
+                  if (boothSiteTextController.text.isNotEmpty &&
+                      boothAreaTextController.text.isNotEmpty &&
+                      boothFloorTextController.text.isNotEmpty &&
+                      boothRoomTextController.text.isNotEmpty &&
+                      unit != null &&
+                      rows != null &&
+                      readingPerRow != null &&
+                      silhouetteWidth != null &&
+                      silhouetteHeight != null &&
+                      targetDdTextController.text.isNotEmpty &&
+                      targetCdTextController.text.isNotEmpty &&
+                      ddDeltaTextController.text.isNotEmpty &&
+                      cdDeltaTextController.text.isNotEmpty) {
+                    print("Site: ${boothSiteTextController.text}");
+                    print("Shop/Area: ${boothAreaTextController.text}");
+                    print("Line/Floor: ${boothFloorTextController.text}");
+                    print("Zone/Room: ${boothRoomTextController.text}");
+                    print("Unit: $unit");
+                    print("Rows: $rows");
+                    print("Reading Per Row: $readingPerRow");
+                    print("Silhouette Width: $silhouetteWidth");
+                    print("Silhouette Height: $silhouetteHeight");
+                    print("Target DD: ${targetDdTextController.text}");
+                    print("Target CD: ${targetCdTextController.text}");
+                    print("DD Delta: ${ddDeltaTextController.text}");
+                    print("CD Delta: ${cdDeltaTextController.text}");
+                  } else {
+                    informationSnackBar(
+                        context, Icons.error, "Fill all fields");
+                  }
+                }
+
                 // await saveConfiguration.writeConfigurationContent(
                 //     "configuration", "HAHAHAA");
                 // ref.read(fileListProvider.notifier).refresh();
