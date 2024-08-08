@@ -3,13 +3,14 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/main/settings/edit_space_defintion.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SpaceDefinitionMain extends StatelessWidget {
+class SpaceDefinitionMain extends ConsumerWidget {
   SpaceDefinitionMain({super.key});
   final TextEditingController fileNameController = TextEditingController();
   final TextEditingController spaceController = TextEditingController();
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Space Definition"),
@@ -59,6 +60,7 @@ class SpaceDefinitionMain extends StatelessWidget {
             ),
             RegularButton(
               onTap: () {
+                ref.read(selectedItemProvider.notifier).clearSelection();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return const EditSpaceDefinition();
                 }));

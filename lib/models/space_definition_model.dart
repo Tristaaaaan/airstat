@@ -1,4 +1,5 @@
 class Configuration {
+  int? id;
   String id1;
   String id2;
   String id3;
@@ -18,6 +19,7 @@ class Configuration {
   int? tbd2;
 
   Configuration({
+    this.id,
     required this.id1,
     required this.id2,
     required this.id3,
@@ -61,6 +63,7 @@ class Configuration {
 
   factory Configuration.fromMap(Map<String, dynamic> map) {
     return Configuration(
+      id: map['id'] as int,
       id1: map['ID1'] as String,
       id2: map['ID2'] as String,
       id3: map['ID3'] as String,

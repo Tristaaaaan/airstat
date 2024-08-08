@@ -99,12 +99,12 @@ class SpaceDefinitionsDatabase {
     );
   }
 
-  Future<int> deleteConfiguration(String id4) async {
+  Future<int> deleteConfiguration(String id) async {
     final db = await spaceDefinitionDb;
     return await db.delete(
       'spaceDefinitions',
-      where: 'ID4 = ?',
-      whereArgs: [id4],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 

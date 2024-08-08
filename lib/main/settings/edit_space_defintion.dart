@@ -1,18 +1,44 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/main/settings/add_space_definition.dart';
 import 'package:airstat/models/space_definition_model.dart';
+import 'package:airstat/notifiers/loading_state_notifiers.dart';
+import 'package:airstat/provider/database_provider.dart';
 import 'package:airstat/services/space_definitions_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class SelectedItemNotifier extends StateNotifier<int?> {
+  SelectedItemNotifier() : super(null);
+
+  void selectItem(int id) {
+    if (state == id) {
+      state = null; // Deselect if the same item is clicked again
+    } else {
+      state = id; // Select the new item
+    }
+  }
+
+  void clearSelection() {
+    state = null; // Clear the selection
+  }
+}
+
+final selectedItemProvider =
+    StateNotifierProvider<SelectedItemNotifier, int?>((ref) {
+  return SelectedItemNotifier();
+});
 
 class EditSpaceDefinition extends ConsumerWidget {
   const EditSpaceDefinition({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final airstatSpaceDefinition =
+    final selectedItem = ref.watch(selectedItemProvider);
+    final airstatSpaceDefinitionStream =
         ref.watch(airstatSpaceDefinitionProviderStream);
+    final airstatSpaceDefinition = ref.watch(airstatSpaceDefinitionProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Space Definition"),
@@ -24,22 +50,35 @@ class EditSpaceDefinition extends ConsumerWidget {
         child: Column(
           children: [
             Expanded(
-                child: airstatSpaceDefinition.when(data: (data) {
+                child: airstatSpaceDefinitionStream.when(data: (data) {
               return ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   final Configuration definition = data[index];
-                  return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Row(
-                        children: [
-                          IDHolder(definition: definition.id1),
-                          IDHolder(definition: definition.id2),
-                          IDHolder(definition: definition.id3),
-                          IDHolder(definition: definition.id4),
-                        ],
-                      ));
+                  final isSelected = definition.id == selectedItem;
+                  return InkWell(
+                    onTap: () {
+                      ref
+                          .read(selectedItemProvider.notifier)
+                          .selectItem(definition.id!);
+                    },
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.background,
+                        ),
+                        child: Row(
+                          children: [
+                            IDHolder(definition: definition.id1),
+                            IDHolder(definition: definition.id2),
+                            IDHolder(definition: definition.id3),
+                            IDHolder(definition: definition.id4),
+                          ],
+                        )),
+                  );
                 },
               );
             }, loading: () {
@@ -64,16 +103,69 @@ class EditSpaceDefinition extends ConsumerWidget {
               size: 50,
               color: Theme.of(context).colorScheme.primary,
             ),
-            RegularButton(
-              onTap: () {
-                ref.read(readingModeProvider.notifier).state = null;
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return AddSpaceDefinition();
-                }));
-              },
-              width: 100,
-              buttonText: "Add",
-              buttonKey: "addSpaceDefinition",
+            Row(
+              children: [
+                RegularButton(
+                  withLoading: true,
+                  onTap: () async {
+                    final isLoading = ref.read(isLoadingProvider.notifier);
+                    final delete = ref.watch(selectedItemProvider);
+
+                    isLoading.setLoading("deleteSpaceDefinition", true);
+                    if (delete != null) {
+                      print("Deleting $delete");
+                      await airstatSpaceDefinition
+                          .deleteConfiguration(delete.toString());
+
+                      await Future.delayed(const Duration(seconds: 1));
+                      if (context.mounted) {
+                        informationSnackBar(context, Icons.check,
+                            "Space definition has been deleted");
+                      }
+                      isLoading.setLoading("deleteSpaceDefinition", false);
+                    } else {
+                      informationSnackBar(context, Icons.warning,
+                          "There is no space definition selected to delete");
+                      isLoading.setLoading("deleteSpaceDefinition", false);
+                    }
+                  },
+                  width: 100,
+                  buttonText: "Delete",
+                  buttonKey: "deleteSpaceDefinition",
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                RegularButton(
+                  onTap: () {
+                    final edit = ref.watch(selectedItemProvider);
+                    if (edit != null) {
+                      print("Edit $edit");
+                    } else {
+                      informationSnackBar(context, Icons.warning,
+                          "There is no space definition selected to edit");
+                    }
+                  },
+                  width: 100,
+                  buttonText: "Edit",
+                  buttonKey: "editSpaceDefinition",
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                RegularButton(
+                  onTap: () {
+                    ref.read(readingModeProvider.notifier).state = null;
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return AddSpaceDefinition();
+                    }));
+                  },
+                  width: 100,
+                  buttonText: "Add",
+                  buttonKey: "addSpaceDefinition",
+                ),
+              ],
             ),
           ],
         ),
