@@ -51,53 +51,167 @@ class SpaceDefinitionList extends ConsumerWidget {
         child: Column(
           children: [
             Expanded(
-                child: airstatSpaceDefinitionStream.when(data: (data) {
-              if (data.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "There are no space definitions available as of the moment",
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
+              child: airstatSpaceDefinitionStream.when(data: (data) {
+                if (data.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      "There are no space definitions available as of the moment",
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                return ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    final Configuration definition = data[index];
-                    final isSelected = definition.id == selectedItem?.id;
-                    return InkWell(
-                      onTap: () {
-                        ref
-                            .read(selectedItemProvider.notifier)
-                            .selectItem(definition);
-                      },
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.background,
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          IDHolder(
+                            definition: "ID1",
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
                           ),
-                          child: Row(
-                            children: [
-                              IDHolder(definition: definition.id1),
-                              IDHolder(definition: definition.id2),
-                              IDHolder(definition: definition.id3),
-                              IDHolder(definition: definition.id4),
-                            ],
-                          )),
-                    );
-                  },
-                );
-              }
-            }, loading: () {
-              return const CircularProgressIndicator();
-            }, error: (error, stackTrace) {
-              return Text(error.toString());
-            }))
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          IDHolder(
+                            definition: "ID2",
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          IDHolder(
+                            definition: "ID3",
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          IDHolder(
+                            definition: "ID4",
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.background,
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            final Configuration definition = data[index];
+                            final isSelected =
+                                definition.id == selectedItem?.id;
+                            return InkWell(
+                              onTap: () {
+                                ref
+                                    .read(selectedItemProvider.notifier)
+                                    .selectItem(definition);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                // decoration: BoxDecoration(
+                                //   color: isSelected
+                                //       ? Theme.of(context).colorScheme.primary
+                                //       : Theme.of(context).colorScheme.background,
+                                // ),
+                                child: Row(
+                                  children: [
+                                    IDHolder(
+                                      definition: definition.id1,
+                                      textColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .background
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .inversePrimary,
+                                      backgroundColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                    ),
+                                    IDHolder(
+                                      definition: definition.id2,
+                                      textColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .background
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .inversePrimary,
+                                      backgroundColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                    ),
+                                    IDHolder(
+                                      definition: definition.id3,
+                                      textColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .background
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .inversePrimary,
+                                      backgroundColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                    ),
+                                    IDHolder(
+                                      definition: definition.id4,
+                                      textColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .background
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .inversePrimary,
+                                      backgroundColor: isSelected
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              }, loading: () {
+                return const CircularProgressIndicator();
+              }, error: (error, stackTrace) {
+                return Text(error.toString());
+              }),
+            )
           ],
         ),
       ),
@@ -126,8 +240,7 @@ class SpaceDefinitionList extends ConsumerWidget {
                     isLoading.setLoading("deleteSpaceDefinition", true);
                     if (delete != null) {
                       print("Deleting $delete");
-                      await airstatSpaceDefinition
-                          .deleteConfiguration(delete.toString());
+                      await airstatSpaceDefinition.deleteConfiguration(delete);
 
                       await Future.delayed(const Duration(seconds: 1));
                       if (context.mounted) {
@@ -197,12 +310,15 @@ class SpaceDefinitionList extends ConsumerWidget {
 }
 
 class IDHolder extends StatelessWidget {
+  final Color backgroundColor;
+  final Color textColor;
+  final String definition;
   const IDHolder({
     super.key,
     required this.definition,
+    required this.backgroundColor,
+    required this.textColor,
   });
-
-  final String definition;
 
   @override
   Widget build(BuildContext context) {
@@ -211,11 +327,12 @@ class IDHolder extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 5),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Text(
           definition,
+          style: TextStyle(color: textColor),
           textAlign: TextAlign.center,
         ),
       ),

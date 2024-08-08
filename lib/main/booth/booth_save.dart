@@ -117,6 +117,18 @@ class BoothSaveData extends ConsumerWidget {
                             .watch(exitSilhouetteTableDataProvider)
                             .data
                             .toString(),
+                        ref.watch(boothRowsProvider).toString(),
+                        ref.watch(boothColumnsProvider).toString(),
+                        ref.watch(boothSilhouetteWidthProvider).toString(),
+                        ref.watch(boothSilhouetteHeightProvider).toString(),
+                        ref.watch(boothTargetDdProvider),
+                        ref.watch(boothTargetCdProvider) == 'null'
+                            ? '--.-'
+                            : ref.watch(boothTargetCdProvider),
+                        ref.watch(boothDdDeltaProvider),
+                        ref.watch(boothCdDeltaProvider) == 'null'
+                            ? '--.-'
+                            : ref.watch(boothCdDeltaProvider),
                       );
 
                       // Refresh the file list after saving the new file

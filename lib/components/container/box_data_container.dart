@@ -18,8 +18,8 @@ class BoxDataContainer extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(5),
-        height: 60,
-        width: 60,
+        height: 80,
+        width: 80,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.secondary,
           border: isSelected
@@ -30,7 +30,7 @@ class BoxDataContainer extends StatelessWidget {
         child: Center(
           child: Text(
             value == "" ? "--.-" : value,
-            style: TextStyle(fontSize: value == "" ? 25 : 12),
+            style: TextStyle(fontSize: value == "" ? 25 : 18),
           ),
         ),
       ),

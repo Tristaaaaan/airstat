@@ -646,6 +646,8 @@ class AddSpaceDefinition extends ConsumerWidget {
                       targetCdTextController.text = "";
                       ddDeltaTextController.text = "";
                       cdDeltaTextController.text = "";
+
+                      Navigator.pop(context);
                     }
                   } else {
                     WidgetsBinding.instance.addPostFrameCallback((_) {

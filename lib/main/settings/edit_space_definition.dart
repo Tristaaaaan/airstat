@@ -3,6 +3,7 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/constants/dropdown_labels.dart';
+import 'package:airstat/main/settings/space_defintion_list.dart';
 import 'package:airstat/models/space_definition_model.dart';
 import 'package:airstat/provider/database_provider.dart';
 import 'package:flutter/material.dart';
@@ -45,10 +46,15 @@ class EditSpaceDefinition extends ConsumerWidget {
     readingPerRow = config.yReadPerRow.toString();
     silhouetteWidth = config.zSilWidth.toString();
     silhouetteHeight = config.silHeight.toString();
-    targetDdTextController.text = config.targetDd.toString();
-    targetCdTextController.text = config.targetSide.toString();
-    ddDeltaTextController.text = config.varDd.toString();
-    cdDeltaTextController.text = config.varCd.toString();
+    targetDdTextController.text =
+        config.targetDd.toString() == "null" ? "" : config.targetDd.toString();
+    targetCdTextController.text = config.targetSide.toString() == "null"
+        ? ""
+        : config.targetSide.toString();
+    ddDeltaTextController.text =
+        config.varDd.toString() == "null" ? "" : config.varDd.toString();
+    cdDeltaTextController.text =
+        config.varCd.toString() == "null" ? "" : config.varCd.toString();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Space Definition"),
@@ -566,6 +572,7 @@ class EditSpaceDefinition extends ConsumerWidget {
             ),
             RegularButton(
               onTap: () async {
+                final selectedItems = ref.read(selectedItemProvider.notifier);
                 if (config.mode == "Booth") {
                   print("Booth");
                   if (boothSiteTextController.text.isNotEmpty &&
@@ -621,6 +628,7 @@ class EditSpaceDefinition extends ConsumerWidget {
                     print("Updated $values rows");
 
                     if (context.mounted) {
+                      selectedItems.clearSelection();
                       informationSnackBar(context, Icons.check,
                           "Space definition has been saved");
                       boothSiteTextController.text = "";
@@ -636,6 +644,8 @@ class EditSpaceDefinition extends ConsumerWidget {
                       targetCdTextController.text = "";
                       ddDeltaTextController.text = "";
                       cdDeltaTextController.text = "";
+
+                      Navigator.of(context).pop();
                     }
                   } else {
                     WidgetsBinding.instance.addPostFrameCallback((_) {

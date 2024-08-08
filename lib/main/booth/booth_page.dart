@@ -41,6 +41,22 @@ final boothSilhouetteHeightProvider = StateProvider<int>((ref) {
   return 0;
 });
 
+final boothTargetDdProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final boothTargetCdProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final boothDdDeltaProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final boothCdDeltaProvider = StateProvider<String>((ref) {
+  return "";
+});
+
 class BoothPage extends HookConsumerWidget {
   const BoothPage({super.key});
 
@@ -163,6 +179,16 @@ class BoothPage extends HookConsumerWidget {
         ref.read(boothSilhouetteHeightProvider.notifier).state =
             int.parse(uniqueZoneLabels.map((e) => e.silHeight).join(', '));
 
+        ref.read(boothTargetDdProvider.notifier).state =
+            uniqueZoneLabels.map((e) => e.targetDd).join(', ');
+
+        ref.read(boothTargetCdProvider.notifier).state =
+            uniqueZoneLabels.map((e) => e.targetSide).join(', ');
+
+        ref.read(boothDdDeltaProvider.notifier).state =
+            uniqueZoneLabels.map((e) => e.varDd).join(', ');
+        ref.read(boothCdDeltaProvider.notifier).state =
+            uniqueZoneLabels.map((e) => e.varCd).join(', ');
         return true;
       }
     }

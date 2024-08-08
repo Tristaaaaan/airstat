@@ -46,34 +46,48 @@ class SpaceDefinitionMain extends ConsumerWidget {
               size: 50,
               color: Theme.of(context).colorScheme.primary,
             ),
-            RegularButton(
-              onTap: () {},
-              width: 100,
-              buttonKey: "backupSpaceDefinition",
-              buttonText: "Backup",
-            ),
-            RegularButton(
-              onTap: () {},
-              width: 100,
-              buttonText: "Restore",
-              buttonKey: "restoreSpaceDefinition",
-            ),
-            RegularButton(
-              onTap: () {
-                ref.read(selectedItemProvider.notifier).clearSelection();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const SpaceDefinitionList();
-                }));
-              },
-              width: 100,
-              buttonText: "Edit",
-              buttonKey: "editSpaceDefinition",
-            ),
-            RegularButton(
-              width: 100,
-              onTap: () {},
-              buttonText: "Delete",
-              buttonKey: "deleteSpaceDefinition",
+            Row(
+              children: [
+                RegularButton(
+                  onTap: () {},
+                  width: 100,
+                  buttonKey: "backupSpaceDefinition",
+                  buttonText: "Backup",
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                RegularButton(
+                  onTap: () {},
+                  width: 100,
+                  buttonText: "Restore",
+                  buttonKey: "restoreSpaceDefinition",
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                RegularButton(
+                  onTap: () {
+                    ref.read(selectedItemProvider.notifier).clearSelection();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return const SpaceDefinitionList();
+                    }));
+                  },
+                  width: 100,
+                  buttonText: "Edit",
+                  buttonKey: "editSpaceDefinition",
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                RegularButton(
+                  width: 100,
+                  onTap: () {},
+                  buttonText: "Delete",
+                  buttonKey: "deleteSpaceDefinition",
+                ),
+              ],
             ),
           ],
         ),
