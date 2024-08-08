@@ -2,6 +2,7 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/request_data.dart';
+import 'package:airstat/main/booth/booth_page.dart';
 import 'package:airstat/main/booth/booth_save.dart';
 import 'package:airstat/main/booth/dynamictables/exit_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/booth/entrance_silhouette_page.dart';
@@ -113,13 +114,15 @@ class ExitSilhouette extends ConsumerWidget {
           AirstatSettingsAppBar(),
         ],
       ),
-      body: const SingleChildScrollView(
+      body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             children: [
-              ExitSilhouetteDynamicTable(rows: 3, columns: 3),
+              ExitSilhouetteDynamicTable(
+                  rows: ref.watch(boothSilhouetteHeightProvider),
+                  columns: ref.watch(boothSilhouetteWidthProvider)),
             ],
           ),
         ),

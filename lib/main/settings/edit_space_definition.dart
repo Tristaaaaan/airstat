@@ -3,17 +3,18 @@ import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/constants/dropdown_labels.dart';
+import 'package:airstat/main/settings/space_defintion_list.dart';
 import 'package:airstat/models/space_definition_model.dart';
 import 'package:airstat/provider/database_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final readingModeProvider = StateProvider<String?>((ref) {
-  return null;
-});
-
-class AddSpaceDefinition extends ConsumerWidget {
-  AddSpaceDefinition({super.key});
+class EditSpaceDefinition extends ConsumerWidget {
+  final Configuration config;
+  EditSpaceDefinition({
+    super.key,
+    required this.config,
+  });
 
   // Text Controllers
   // Booth
@@ -31,14 +32,29 @@ class AddSpaceDefinition extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final airstatSpaceDefinition = ref.watch(airstatSpaceDefinitionProvider);
-    final readingMode = ref.watch(readingModeProvider);
-
+    boothSiteTextController.text = config.id1;
+    boothAreaTextController.text = config.id2;
+    boothFloorTextController.text = config.id3;
+    boothRoomTextController.text = config.id4;
     String? unit;
     String? rows;
     String? readingPerRow;
     String? silhouetteWidth;
     String? silhouetteHeight;
-
+    unit = config.units;
+    rows = config.xRows.toString();
+    readingPerRow = config.yReadPerRow.toString();
+    silhouetteWidth = config.zSilWidth.toString();
+    silhouetteHeight = config.silHeight.toString();
+    targetDdTextController.text =
+        config.targetDd.toString() == "null" ? "" : config.targetDd.toString();
+    targetCdTextController.text = config.targetSide.toString() == "null"
+        ? ""
+        : config.targetSide.toString();
+    ddDeltaTextController.text =
+        config.varDd.toString() == "null" ? "" : config.varDd.toString();
+    cdDeltaTextController.text =
+        config.varCd.toString() == "null" ? "" : config.varCd.toString();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Space Definition"),
@@ -47,41 +63,7 @@ class AddSpaceDefinition extends ConsumerWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Reading Mode",
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  SizedBox(
-                    width: 315,
-                    child: DropdownMenu<ReadingModeLabels>(
-                      dropdownMenuEntries: ReadingModeLabels.values
-                          .map<DropdownMenuEntry<ReadingModeLabels>>(
-                              (ReadingModeLabels label) {
-                        return DropdownMenuEntry<ReadingModeLabels>(
-                          value: label,
-                          label: label.label,
-                          style: MenuItemButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).colorScheme.inversePrimary,
-                          ),
-                        );
-                      }).toList(),
-                      expandedInsets: const EdgeInsets.all(0),
-                      onSelected: (value) {
-                        ref.read(readingModeProvider.notifier).state =
-                            value!.label;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (readingMode == "Booth")
+            if (config.mode == "Booth")
               Column(
                 children: [
                   RegularTextField(
@@ -113,6 +95,8 @@ class AddSpaceDefinition extends ConsumerWidget {
                         SizedBox(
                           width: 315,
                           child: DropdownMenu<UnitLabels>(
+                            initialSelection: UnitLabels.values.firstWhere(
+                                (unitLabel) => unitLabel.label == unit),
                             dropdownMenuEntries: UnitLabels.values
                                 .map<DropdownMenuEntry<UnitLabels>>(
                                     (UnitLabels color) {
@@ -152,6 +136,8 @@ class AddSpaceDefinition extends ConsumerWidget {
                               SizedBox(
                                 width: 220,
                                 child: DropdownMenu(
+                                  initialSelection: RowLabels.values.firstWhere(
+                                      (rowLabels) => rowLabels.label == rows),
                                   dropdownMenuEntries: RowLabels.values
                                       .map<DropdownMenuEntry<RowLabels>>(
                                           (RowLabels label) {
@@ -199,6 +185,10 @@ class AddSpaceDefinition extends ConsumerWidget {
                               SizedBox(
                                 width: 220,
                                 child: DropdownMenu(
+                                  initialSelection: ReadingPerRowLabels.values
+                                      .firstWhere((readingPerRowLabels) =>
+                                          readingPerRowLabels.label ==
+                                          readingPerRow),
                                   dropdownMenuEntries:
                                       ReadingPerRowLabels.values.map<
                                               DropdownMenuEntry<
@@ -249,6 +239,10 @@ class AddSpaceDefinition extends ConsumerWidget {
                               SizedBox(
                                 width: 220,
                                 child: DropdownMenu(
+                                  initialSelection: SilhouetteWidthLabels.values
+                                      .firstWhere((silhouetteWidthLabels) =>
+                                          silhouetteWidthLabels.label ==
+                                          silhouetteWidth),
                                   dropdownMenuEntries:
                                       SilhouetteWidthLabels.values.map<
                                               DropdownMenuEntry<
@@ -299,6 +293,11 @@ class AddSpaceDefinition extends ConsumerWidget {
                               SizedBox(
                                 width: 220,
                                 child: DropdownMenu(
+                                  initialSelection: SilhouetteHeightLabels
+                                      .values
+                                      .firstWhere((silhouetteHeightLabels) =>
+                                          silhouetteHeightLabels.label ==
+                                          silhouetteHeight),
                                   dropdownMenuEntries:
                                       SilhouetteHeightLabels.values.map<
                                               DropdownMenuEntry<
@@ -354,7 +353,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                   ),
                 ],
               ),
-            if (readingMode == "OR" || readingMode == "All")
+            if (config.mode == "OR" || config.mode == "All")
               const Column(
                 children: [
                   RegularTextField(category: "Site"),
@@ -363,7 +362,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                   RegularTextField(category: "Zone / Room"),
                 ],
               ),
-            if (readingMode == "3D")
+            if (config.mode == "3D")
               Column(
                 children: [
                   const RegularTextField(category: "Site"),
@@ -573,7 +572,8 @@ class AddSpaceDefinition extends ConsumerWidget {
             ),
             RegularButton(
               onTap: () async {
-                if (ref.watch(readingModeProvider) == "Booth") {
+                final selectedItems = ref.read(selectedItemProvider.notifier);
+                if (config.mode == "Booth") {
                   print("Booth");
                   if (boothSiteTextController.text.isNotEmpty &&
                       boothAreaTextController.text.isNotEmpty &&
@@ -600,13 +600,14 @@ class AddSpaceDefinition extends ConsumerWidget {
                     print("DD Delta: ${ddDeltaTextController.text}");
                     print("CD Delta: ${cdDeltaTextController.text}");
 
-                    Configuration addAirstatSpaceDefinition = Configuration(
+                    Configuration updateSpaceDefinition = Configuration(
+                      id: config.id,
                       id1: boothSiteTextController.text,
                       id2: boothAreaTextController.text,
                       id3: boothFloorTextController.text,
                       id4: boothRoomTextController.text,
                       units: unit!,
-                      mode: ref.watch(readingModeProvider) as String,
+                      mode: config.mode,
                       xRows: int.parse(rows!),
                       yReadPerRow: int.parse(readingPerRow!),
                       zSilWidth: int.parse(silhouetteWidth!),
@@ -621,16 +622,13 @@ class AddSpaceDefinition extends ConsumerWidget {
                           : int.parse(cdDeltaTextController.text),
                     );
 
-                    airstatSpaceDefinition
-                        .insertConfiguration(addAirstatSpaceDefinition);
-                    final List<Configuration> values =
-                        await airstatSpaceDefinition.getAllConfigurations();
+                    final int values = await airstatSpaceDefinition
+                        .updateConfiguration(updateSpaceDefinition);
 
-                    for (final value in values) {
-                      print("Configuration: ${value.id4}");
-                    }
+                    print("Updated $values rows");
 
                     if (context.mounted) {
+                      selectedItems.clearSelection();
                       informationSnackBar(context, Icons.check,
                           "Space definition has been saved");
                       boothSiteTextController.text = "";
@@ -647,7 +645,7 @@ class AddSpaceDefinition extends ConsumerWidget {
                       ddDeltaTextController.text = "";
                       cdDeltaTextController.text = "";
 
-                      Navigator.pop(context);
+                      Navigator.of(context).pop();
                     }
                   } else {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -656,13 +654,9 @@ class AddSpaceDefinition extends ConsumerWidget {
                     });
                   }
                 }
-
-                // await saveConfiguration.writeConfigurationContent(
-                //     "configuration", "HAHAHAA");
-                // ref.read(fileListProvider.notifier).refresh();
               },
               width: 100,
-              buttonKey: "saveNewSpaceDefinition",
+              buttonKey: "editNewSpaceDefinition",
               buttonText: "Save",
             ),
           ],

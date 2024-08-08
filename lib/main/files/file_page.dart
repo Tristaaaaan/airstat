@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:airstat/components/button/regular_button.dart';
+import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/functions/file_size_getter.dart';
+import 'package:airstat/main/files/open_file_page.dart';
 import 'package:airstat/permission/permission_handlers.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
 import 'package:airstat/provider/save_data_provider.dart';
@@ -42,7 +44,6 @@ class FilePage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Files"),
-        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -165,9 +166,23 @@ class FilePage extends ConsumerWidget {
                 buttonKey: "openButton",
                 width: double.infinity,
                 onTap: () {
-                  for (var filePath in selectedFileContent.keys) {
-                    final content = selectedFileContent[filePath];
-                    print('Content of $filePath: $content');
+                  final selectedFiles = ref.watch(selectedFilesProvider);
+                  if (selectedFiles.isEmpty) {
+                    informationSnackBar(
+                        context, Icons.info, "There are no files selected");
+                  } else {
+                    for (var filePath in selectedFileContent.keys) {
+                      selectedFileContent[filePath];
+                    }
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const OpenFiles();
+                        },
+                      ),
+                    );
                   }
                 },
               ),

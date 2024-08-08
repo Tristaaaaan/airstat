@@ -93,6 +93,11 @@ class Home extends HookConsumerWidget {
                     image: 'assets/icons/Icon_booth_orange.png',
                     label: 'Booth',
                     onTap: () {
+                      ref.read(siteValueProvider.notifier).state = '';
+                      ref.read(shopValueProvider.notifier).state = '';
+                      ref.read(lineValueProvider.notifier).state = '';
+                      ref.read(zoneValueProvider.notifier).state = '';
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

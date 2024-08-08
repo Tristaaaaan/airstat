@@ -38,6 +38,14 @@ class SaveFiles {
     String entranceSilhoutte,
     String boothReading,
     String exitSilhouette,
+    String rows,
+    String readingPerRow,
+    String silhouetteWidth,
+    String silhouetteHeight,
+    String targetDd,
+    String targetCd,
+    String ddDelta,
+    String cdDelta,
   ) async {
     try {
       final file = await _localFile(fileName);
@@ -59,7 +67,7 @@ class SaveFiles {
         // BOOTH
       } else if (readingMode == 'booth') {
         String csvContent =
-            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: $site, id2: $shop, id3: $line, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: --.-, readings_per_row: --.-, levels: --.-, sil_height: --.-, target_dd: --.-, target_side: --.-, var_dd: --.-, var_cd: --.-, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: [booth_reading: $boothReading, entrance_silhouette: $entranceSilhoutte,  exit_silhouette: $exitSilhouette], notes: --.-''';
+            '''datetime: 2021-03-06_01:02:31, lastupdate: 2021-03-06_01:02:31, filename: $fileName.csv, id1: $site, id2: $shop, id3: $line, id4: $zoneId, mode: $readingMode, type: --.-, reading_rows: $rows, readings_per_row: $readingPerRow, levels: --.-, sil_width: $silhouetteWidth, sil_height: $silhouetteHeight,  target_dd: $targetDd, target_side: $targetCd, var_dd: $ddDelta, var_cd: $cdDelta, user/identification: --.-, num_sampling: $numSampling, delay: $delay, unit: $unit, hash: --.-, asset: --.-, app_version: --.-, data: [booth_reading: $boothReading, entrance_silhouette: $entranceSilhoutte,  exit_silhouette: $exitSilhouette], notes: --.-''';
 
         return await file.writeAsString(csvContent);
       } else {
