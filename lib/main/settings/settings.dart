@@ -4,7 +4,6 @@ import 'package:airstat/components/container/settings_container_one.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
 import 'package:airstat/models/settings_model.dart';
-import 'package:airstat/provider/database_provider.dart';
 import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -88,7 +87,6 @@ class Settings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final airstatDatabase = ref.watch(airstatDatabaseProvider);
     final selectedGeneralSampling = ref.watch(selectedGeneralSamplingProvider);
     final selectedSilhoutteVentsSampling =
         ref.watch(silhoutteVentsSamplingProvider);

@@ -1,7 +1,7 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/textfield/regular_textfield.dart';
-import 'package:airstat/main/settings/edit_space_defintion.dart';
+import 'package:airstat/main/settings/space_defintion_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -62,7 +62,7 @@ class SpaceDefinitionMain extends ConsumerWidget {
               onTap: () {
                 ref.read(selectedItemProvider.notifier).clearSelection();
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return const EditSpaceDefinition();
+                  return const SpaceDefinitionList();
                 }));
               },
               width: 100,

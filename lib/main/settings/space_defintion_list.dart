@@ -2,6 +2,7 @@ import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
 import 'package:airstat/main/settings/add_space_definition.dart';
+import 'package:airstat/main/settings/edit_space_definition.dart';
 import 'package:airstat/models/space_definition_model.dart';
 import 'package:airstat/notifiers/loading_state_notifiers.dart';
 import 'package:airstat/provider/database_provider.dart';
@@ -9,14 +10,14 @@ import 'package:airstat/services/space_definitions_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class SelectedItemNotifier extends StateNotifier<int?> {
+class SelectedItemNotifier extends StateNotifier<Configuration?> {
   SelectedItemNotifier() : super(null);
 
-  void selectItem(int id) {
-    if (state == id) {
+  void selectItem(Configuration config) {
+    if (state != null && state!.id == config.id) {
       state = null; // Deselect if the same item is clicked again
     } else {
-      state = id; // Select the new item
+      state = config; // Select the new item
     }
   }
 
@@ -26,12 +27,12 @@ class SelectedItemNotifier extends StateNotifier<int?> {
 }
 
 final selectedItemProvider =
-    StateNotifierProvider<SelectedItemNotifier, int?>((ref) {
+    StateNotifierProvider<SelectedItemNotifier, Configuration?>((ref) {
   return SelectedItemNotifier();
 });
 
-class EditSpaceDefinition extends ConsumerWidget {
-  const EditSpaceDefinition({super.key});
+class SpaceDefinitionList extends ConsumerWidget {
+  const SpaceDefinitionList({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,36 +52,47 @@ class EditSpaceDefinition extends ConsumerWidget {
           children: [
             Expanded(
                 child: airstatSpaceDefinitionStream.when(data: (data) {
-              return ListView.builder(
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  final Configuration definition = data[index];
-                  final isSelected = definition.id == selectedItem;
-                  return InkWell(
-                    onTap: () {
-                      ref
-                          .read(selectedItemProvider.notifier)
-                          .selectItem(definition.id!);
-                    },
-                    child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.background,
-                        ),
-                        child: Row(
-                          children: [
-                            IDHolder(definition: definition.id1),
-                            IDHolder(definition: definition.id2),
-                            IDHolder(definition: definition.id3),
-                            IDHolder(definition: definition.id4),
-                          ],
-                        )),
-                  );
-                },
-              );
+              if (data.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "There are no space definitions available as of the moment",
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final Configuration definition = data[index];
+                    final isSelected = definition.id == selectedItem?.id;
+                    return InkWell(
+                      onTap: () {
+                        ref
+                            .read(selectedItemProvider.notifier)
+                            .selectItem(definition);
+                      },
+                      child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.background,
+                          ),
+                          child: Row(
+                            children: [
+                              IDHolder(definition: definition.id1),
+                              IDHolder(definition: definition.id2),
+                              IDHolder(definition: definition.id3),
+                              IDHolder(definition: definition.id4),
+                            ],
+                          )),
+                    );
+                  },
+                );
+              }
             }, loading: () {
               return const CircularProgressIndicator();
             }, error: (error, stackTrace) {
@@ -139,8 +151,17 @@ class EditSpaceDefinition extends ConsumerWidget {
                 RegularButton(
                   onTap: () {
                     final edit = ref.watch(selectedItemProvider);
+
                     if (edit != null) {
-                      print("Edit $edit");
+                      print("Edit ${edit.mode}");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return EditSpaceDefinition(config: edit);
+                          },
+                        ),
+                      );
                     } else {
                       informationSnackBar(context, Icons.warning,
                           "There is no space definition selected to edit");
@@ -155,6 +176,7 @@ class EditSpaceDefinition extends ConsumerWidget {
                 ),
                 RegularButton(
                   onTap: () {
+                    ref.read(selectedItemProvider.notifier).clearSelection();
                     ref.read(readingModeProvider.notifier).state = null;
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {

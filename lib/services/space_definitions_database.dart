@@ -74,12 +74,12 @@ class SpaceDefinitionsDatabase {
     });
   }
 
-  Future<Configuration?> getConfiguration(String id4) async {
+  Future<Configuration?> getConfiguration(Configuration config) async {
     final db = await spaceDefinitionDb;
     final List<Map<String, dynamic>> maps = await db.query(
       'spaceDefinitions',
-      where: 'ID4 = ?',
-      whereArgs: [id4],
+      where: 'id = ?',
+      whereArgs: [config.id],
     );
 
     if (maps.isNotEmpty) {
@@ -94,8 +94,8 @@ class SpaceDefinitionsDatabase {
     return await db.update(
       'spaceDefinitions',
       config.toMap(),
-      where: 'ID4 = ?',
-      whereArgs: [config.id4],
+      where: 'id = ?',
+      whereArgs: [config.id],
     );
   }
 
