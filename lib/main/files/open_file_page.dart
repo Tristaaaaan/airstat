@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:airstat/main/files/file_page.dart';
+import 'package:airstat/main/settings/space_defintion_list.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -50,52 +51,140 @@ class OpenFiles extends ConsumerWidget {
 
           return Column(
             children: [
+              Row(
+                children: [
+                  IDHolder(
+                    definition: "DataPoint",
+                    textColor: Theme.of(context).colorScheme.inversePrimary,
+                    backgroundColor: Theme.of(context).colorScheme.background,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  IDHolder(
+                    definition: "Downdraft",
+                    textColor: Theme.of(context).colorScheme.inversePrimary,
+                    backgroundColor: Theme.of(context).colorScheme.background,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  IDHolder(
+                    definition: "CrossDraft",
+                    textColor: Theme.of(context).colorScheme.inversePrimary,
+                    backgroundColor: Theme.of(context).colorScheme.background,
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                ],
+              ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: dataList.length,
-                  itemBuilder: (context, dataIndex) {
-                    final dataRow = dataList[dataIndex];
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            margin: const EdgeInsets.all(5),
-                            child: Text(
-                              "Measurement ${(dataRow[0] + 1).toString()}",
-                            ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) => const SizedBox(
+                      height: 5,
+                    ),
+                    itemCount: dataList.length,
+                    itemBuilder: (context, dataIndex) {
+                      final dataRow = dataList[dataIndex];
+                      return Row(
+                        children: [
+                          IDHolder(
+                            definition:
+                                "Measurement ${(dataRow[0] + 1).toString()}",
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
                           ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            dataRow[1].toString(),
+                          const SizedBox(
+                            width: 5,
                           ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            dataRow[2].toString(),
+                          IDHolder(
+                            definition: dataRow[1].toString(),
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
                           ),
-                        ),
-                      ],
-                    );
-                  },
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          IDHolder(
+                            definition: dataRow[1].toString(),
+                            textColor:
+                                Theme.of(context).colorScheme.inversePrimary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
           );
         },
       ),
-      bottomSheet: SizedBox(
-        height: 80,
-        child: SmoothPageIndicator(
-          controller: controller,
-          count: selectedFileContent.length,
-          effect: WormEffect(
-            dotHeight: 10,
-            dotWidth: 10,
-            dotColor: Theme.of(context).colorScheme.secondary,
-            activeDotColor: Theme.of(context).colorScheme.tertiaryContainer,
-          ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 5,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Image.asset(
+                  "assets/icons/Icon_files_orange.png",
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                const SizedBox(
+                  height: 50,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Filename",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Reading Mode",
+                        textAlign: TextAlign.left,
+                        style: TextStyle(fontSize: 12),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SmoothPageIndicator(
+              controller: controller,
+              count: selectedFileContent.length,
+              effect: WormEffect(
+                dotHeight: 10,
+                dotWidth: 10,
+                dotColor: Theme.of(context).colorScheme.secondary,
+                activeDotColor: Theme.of(context).colorScheme.tertiaryContainer,
+              ),
+            ),
+          ],
         ),
       ),
     );
