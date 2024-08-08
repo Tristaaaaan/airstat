@@ -1,7 +1,6 @@
 import 'package:airstat/components/appbar/airstats_settings_appbar.dart';
 import 'package:airstat/components/button/regular_button.dart';
 import 'package:airstat/components/snackbar/information_snackbar.dart';
-import 'package:airstat/main/booth/booth_reading_page.dart';
 import 'package:airstat/main/booth/dynamictables/entrance_silhoutte_dynamic_table.dart';
 import 'package:airstat/main/booth/entrance_silhouette_page.dart';
 import 'package:airstat/models/space_definition_model.dart';
@@ -126,12 +125,13 @@ class BoothPage extends HookConsumerWidget {
           .map((config) => config.id4) // Extract id2 values
           .toSet() // Remove duplicates
           .toList(); // Convert to list
+
       print("Unique Shop Labels: $uniqueZoneLabels");
       // Update the state with the uniqueSiteLabels
       zoneLabels.value = uniqueZoneLabels;
     }
 
-    Future<void> getRowData() async {
+    Future<bool> getRowData() async {
       final List<Configuration> data =
           await SpaceDefinitionsDatabase().getAllConfigurations();
       final currentSiteValue = ref.watch(siteValueProvider);
@@ -151,15 +151,20 @@ class BoothPage extends HookConsumerWidget {
           ; // Convert to list
       print(
           "Unique Shop Labels: ${uniqueZoneLabels.map((e) => e.silHeight).join(', ')}");
+      if (uniqueZoneLabels.isEmpty) {
+        return false;
+      } else {
+        ref.read(boothRowsProvider.notifier).state =
+            int.parse(uniqueZoneLabels.map((e) => e.xRows).join(', '));
+        ref.read(boothColumnsProvider.notifier).state =
+            int.parse(uniqueZoneLabels.map((e) => e.yReadPerRow).join(', '));
+        ref.read(boothSilhouetteWidthProvider.notifier).state =
+            int.parse(uniqueZoneLabels.map((e) => e.zSilWidth).join(', '));
+        ref.read(boothSilhouetteHeightProvider.notifier).state =
+            int.parse(uniqueZoneLabels.map((e) => e.silHeight).join(', '));
 
-      ref.read(boothRowsProvider.notifier).state =
-          int.parse(uniqueZoneLabels.map((e) => e.xRows).join(', '));
-      ref.read(boothColumnsProvider.notifier).state =
-          int.parse(uniqueZoneLabels.map((e) => e.yReadPerRow).join(', '));
-      ref.read(boothSilhouetteWidthProvider.notifier).state =
-          int.parse(uniqueZoneLabels.map((e) => e.zSilWidth).join(', '));
-      ref.read(boothSilhouetteHeightProvider.notifier).state =
-          int.parse(uniqueZoneLabels.map((e) => e.silHeight).join(', '));
+        return true;
+      }
     }
 
     useEffect(() {
@@ -362,7 +367,7 @@ class BoothPage extends HookConsumerWidget {
                                 // Update the state with the selected value
                                 ref.read(zoneValueProvider.notifier).state =
                                     value!;
-                                await getRowData();
+
                                 // Delay to ensure state update propagation (if necessary)
 
                                 // Fetch and update zone labels or any other dependent data
@@ -396,7 +401,7 @@ class BoothPage extends HookConsumerWidget {
               buttonText: "Next",
               buttonKey: "boothNext",
               width: 100,
-              onTap: () {
+              onTap: () async {
                 if (ref.watch(siteValueProvider) == "" ||
                     ref.watch(shopValueProvider) == "" ||
                     ref.watch(lineValueProvider) == "" ||
@@ -404,17 +409,29 @@ class BoothPage extends HookConsumerWidget {
                   informationSnackBar(
                       context, Icons.warning, "Please fill in all the fields");
                 } else {
-                  ref.read(selectedBoxProvider.notifier).clearValues();
+                  final bool rowData = await getRowData();
 
-                  print("${ref.watch(boothReadingTableDataProvider).data}");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const EntranceSilhouette();
-                      },
-                    ),
-                  );
+                  if (rowData) {
+                    ref.read(selectedBoxProvider.notifier).clearValues();
+                    print(
+                        "There is no mismatch in the space definition you entered");
+
+                    if (context.mounted) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const EntranceSilhouette();
+                          },
+                        ),
+                      );
+                    }
+                  } else {
+                    if (context.mounted) {
+                      informationSnackBar(context, Icons.warning,
+                          "There is a mismatch in the space definition you entered");
+                    }
+                  }
                 }
               },
             ),
