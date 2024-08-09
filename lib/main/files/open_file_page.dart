@@ -28,25 +28,41 @@ class OpenFiles extends ConsumerWidget {
           final String key = selectedFileContent.keys.elementAt(index);
           // Get the value associated with the key
           final String value = selectedFileContent[key]!;
-          final RegExp dataRegExp = RegExp(r'data:\s*(\[\[.*?\]\])');
-          String data = '';
-          // Search for the pattern in the csvContent
-          final dataMatch = dataRegExp.firstMatch(value);
-          // Convert string to List<List<dynamic>>
-          print("DATA: $dataMatch");
-          if (dataMatch != null) {
-            // Extract the data value from the match
-            data = dataMatch.group(1)!;
+          // Regular expression to extract the mode
+          RegExp regExp = RegExp(r'mode:\s*(\S+),');
+          Match? modeMatch = regExp.firstMatch(value);
+          String? mode;
+          if (modeMatch != null) {
+            mode = modeMatch.group(1)!;
+            print('Extracted mode: $mode');
           } else {
-            print("Data field not found.");
+            print('Mode not found');
           }
           List<List<dynamic>> dataList = [];
-          try {
-            dataList = List<List<dynamic>>.from(
-              json.decode(data).map((item) => List<dynamic>.from(item)),
-            );
-          } catch (e) {
-            print("Error decoding data: $e");
+          if (mode == 'random' || mode == 'continuous') {
+            print("Mode: $modeMatch");
+            final RegExp dataRegExp = RegExp(r'data:\s*(\[\[.*?\]\])');
+            String data = '';
+            // Search for the pattern in the csvContent
+            final dataMatch = dataRegExp.firstMatch(value);
+            // Convert string to List<List<dynamic>>
+            print("DATA: $dataMatch");
+            if (dataMatch != null) {
+              // Extract the data value from the match
+              data = dataMatch.group(1)!;
+            } else {
+              print("Data field not found.");
+            }
+
+            try {
+              dataList = List<List<dynamic>>.from(
+                json.decode(data).map((item) => List<dynamic>.from(item)),
+              );
+            } catch (e) {
+              print("Error decoding data: $e");
+            }
+          } else {
+            print("Mode not found");
           }
 
           return Column(
@@ -95,8 +111,9 @@ class OpenFiles extends ConsumerWidget {
                       return Row(
                         children: [
                           IDHolder(
-                            definition:
-                                "Measurement ${(dataRow[0] + 1).toString()}",
+                            definition: mode == "random"
+                                ? "Measurement ${(dataRow[0] + 1).toString()}"
+                                : "DataPoint ${(dataRow[0] + 1).toString()}",
                             textColor:
                                 Theme.of(context).colorScheme.inversePrimary,
                             backgroundColor:
