@@ -51,7 +51,8 @@ final selectedGeneralSamplingProvider = StateProvider<List<bool>>((ref) {
 });
 
 final silhoutteVentsSamplingProvider = StateProvider<List<bool>>((ref) {
-  return [true, false, false, false, false];
+  final currentValue = ref.watch(ventSamplingValueProvider);
+  return silhoutteVentsSampling.map((value) => value == currentValue).toList();
 });
 
 final selectedGeneralDelayProvider = StateProvider<List<bool>>((ref) {
@@ -60,7 +61,8 @@ final selectedGeneralDelayProvider = StateProvider<List<bool>>((ref) {
 });
 
 final silhoutteVentsDelayProvider = StateProvider<List<bool>>((ref) {
-  return [true, false, false, false, false];
+  final currentValue = ref.watch(ventDelayValueProvider);
+  return silhoutteVentsDelay.map((value) => value == currentValue).toList();
 });
 
 final selectedUnitProvider = StateProvider<List<bool>>((ref) {
@@ -76,15 +78,29 @@ final generalDelayValueProvider = StateProvider<String>((ref) {
   return "";
 });
 
+final ventSamplingValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
+final ventDelayValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
 final unitValueProvider = StateProvider<String>((ref) {
   return "";
 });
 
+final userNameValueProvider = StateProvider<String>((ref) {
+  return "";
+});
+
 class Settings extends ConsumerWidget {
-  const Settings({
+  Settings({
     super.key,
   });
 
+  final TextEditingController userNameController = TextEditingController();
+  final TextEditingController cloudNameController = TextEditingController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedGeneralSampling = ref.watch(selectedGeneralSamplingProvider);
@@ -93,10 +109,13 @@ class Settings extends ConsumerWidget {
     final selectedGeneralDelay = ref.watch(selectedGeneralDelayProvider);
     final selectedSilhoutteVentsDelay = ref.watch(silhoutteVentsDelayProvider);
     final selectedUnits = ref.watch(selectedUnitProvider);
-
+    final userNameValue = ref.watch(userNameValueProvider);
     final generalDelayValue = ref.watch(generalDelayValueProvider);
     final generalSamplingValue = ref.watch(generalSamplingValueProvider);
+    final ventSamplingValue = ref.watch(ventSamplingValueProvider);
+    final ventDelayValue = ref.watch(ventDelayValueProvider);
     final unitValue = ref.watch(unitValueProvider);
+    userNameController.text = userNameValue;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -160,9 +179,8 @@ class Settings extends ConsumerWidget {
                         selectedSilhoutteVentsSampling.length,
                         (i) => i == index,
                       );
-
-                      print(
-                          'Silhoutte / Vents Sampling: ${silhoutteVentsSampling[index]}');
+                      ref.read(ventSamplingValueProvider.notifier).state =
+                          silhoutteVentsSampling[index];
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -235,6 +253,8 @@ class Settings extends ConsumerWidget {
                         silhoutteVentsDelay.length,
                         (i) => i == index,
                       );
+                      ref.read(ventDelayValueProvider.notifier).state =
+                          silhoutteVentsDelay[index];
                     },
                     borderRadius: const BorderRadius.all(Radius.circular(8)),
                     selectedBorderColor: Colors.red[200],
@@ -289,10 +309,16 @@ class Settings extends ConsumerWidget {
               ),
             ),
             const SettingsContainerOne(category: "Spaces Configuration"),
-            const RegularTextField(
-                category: "User / Test ID", hinttext: "username"),
-            const RegularTextField(
-                category: "Cloud Folder", hinttext: "folder name"),
+            RegularTextField(
+              category: "User / Test ID",
+              hinttext: "username",
+              controller: userNameController,
+            ),
+            RegularTextField(
+              category: "Cloud Folder",
+              hinttext: "folder name",
+              controller: cloudNameController,
+            ),
           ],
         ),
       ),
@@ -314,24 +340,37 @@ class Settings extends ConsumerWidget {
               buttonKey: "saveButton",
               width: 100,
               onTap: () async {
-                AirstatSettingsModel settings = AirstatSettingsModel(
-                  delay: int.parse(generalDelayValue),
-                  sampling: int.parse(generalSamplingValue),
-                  unit: unitValue,
-                );
+                if (userNameController.text.isNotEmpty) {
+                  print("username: ${userNameController.text}");
+                  ref.read(userNameValueProvider.notifier).state =
+                      userNameController.text;
+                  AirstatSettingsModel settings = AirstatSettingsModel(
+                    delay: int.parse(generalDelayValue),
+                    sampling: int.parse(generalSamplingValue),
+                    unit: unitValue,
+                    ventDelay: int.parse(ventDelayValue),
+                    ventSampling: int.parse(ventSamplingValue),
+                    username: userNameController.text,
+                  );
 
-                AirstatSettingsConfiguration config =
-                    AirstatSettingsConfiguration();
-                // final dataBefore = await config.getAirstatSettingsDatabase();
-                // print("Before Settings: ${dataBefore.toMap()}");
-                await config.updateAirstatSettingsDatabase(settings);
+                  AirstatSettingsConfiguration config =
+                      AirstatSettingsConfiguration();
+                  // final dataBefore = await config.getAirstatSettingsDatabase();
+                  // print("Before Settings: ${dataBefore.toMap()}");
+                  await config.updateAirstatSettingsDatabase(settings);
 
-                // final dataAfter = await config.getAirstatSettingsDatabase();
-                // print("After Settings: ${dataAfter.toMap()}");
+                  // final dataAfter = await config.getAirstatSettingsDatabase();
+                  // print("After Settings: ${dataAfter.toMap()}");
 
-                if (context.mounted) {
-                  informationSnackBar(
-                      context, Icons.check, "Settings has been saved.");
+                  if (context.mounted) {
+                    informationSnackBar(
+                        context, Icons.check, "Settings has been saved.");
+                  }
+                } else {
+                  if (context.mounted) {
+                    informationSnackBar(
+                        context, Icons.warning, "Kindly enter a username.");
+                  }
                 }
               },
             ),

@@ -574,7 +574,6 @@ class AddSpaceDefinition extends ConsumerWidget {
             RegularButton(
               onTap: () async {
                 if (ref.watch(readingModeProvider) == "Booth") {
-                  print("Booth");
                   if (boothSiteTextController.text.isNotEmpty &&
                       boothAreaTextController.text.isNotEmpty &&
                       boothFloorTextController.text.isNotEmpty &&
@@ -586,68 +585,73 @@ class AddSpaceDefinition extends ConsumerWidget {
                       silhouetteHeight != null &&
                       targetDdTextController.text.isNotEmpty &&
                       ddDeltaTextController.text.isNotEmpty) {
-                    print("Site: ${boothSiteTextController.text}");
-                    print("Shop/Area: ${boothAreaTextController.text}");
-                    print("Line/Floor: ${boothFloorTextController.text}");
-                    print("Zone/Room: ${boothRoomTextController.text}");
-                    print("Unit: $unit");
-                    print("Rows: $rows");
-                    print("Reading Per Row: $readingPerRow");
-                    print("Silhouette Width: $silhouetteWidth");
-                    print("Silhouette Height: $silhouetteHeight");
-                    print("Target DD: ${targetDdTextController.text}");
-                    print("Target CD: ${targetCdTextController.text}");
-                    print("DD Delta: ${ddDeltaTextController.text}");
-                    print("CD Delta: ${cdDeltaTextController.text}");
-
-                    Configuration addAirstatSpaceDefinition = Configuration(
-                      id1: boothSiteTextController.text,
-                      id2: boothAreaTextController.text,
-                      id3: boothFloorTextController.text,
-                      id4: boothRoomTextController.text,
-                      units: unit!,
-                      mode: ref.watch(readingModeProvider) as String,
-                      xRows: int.parse(rows!),
-                      yReadPerRow: int.parse(readingPerRow!),
-                      zSilWidth: int.parse(silhouetteWidth!),
-                      silHeight: int.parse(silhouetteHeight!),
-                      targetDd: int.parse(targetDdTextController.text),
-                      targetSide: targetCdTextController.text == ""
-                          ? null
-                          : int.parse(targetCdTextController.text),
-                      varDd: int.parse(ddDeltaTextController.text),
-                      varCd: cdDeltaTextController.text == ""
-                          ? null
-                          : int.parse(cdDeltaTextController.text),
+                    final checkIds = await airstatSpaceDefinition
+                        .checkConfigurationReadingModeSpecific(
+                      ref.watch(readingModeProvider).toString(),
+                      boothSiteTextController.text,
+                      boothAreaTextController.text,
+                      boothFloorTextController.text,
+                      boothRoomTextController.text,
+                      false,
+                      0,
                     );
 
-                    airstatSpaceDefinition
-                        .insertConfiguration(addAirstatSpaceDefinition);
-                    final List<Configuration> values =
-                        await airstatSpaceDefinition.getAllConfigurations();
+                    if (checkIds) {
+                      if (context.mounted) {
+                        informationSnackBar(context, Icons.warning,
+                            "The configuration you entered already exist.");
+                      }
+                      return;
+                    } else {
+                      Configuration addAirstatSpaceDefinition = Configuration(
+                        id1: boothSiteTextController.text,
+                        id2: boothAreaTextController.text,
+                        id3: boothFloorTextController.text,
+                        id4: boothRoomTextController.text,
+                        units: unit!,
+                        mode: ref.watch(readingModeProvider) as String,
+                        xRows: int.parse(rows!),
+                        yReadPerRow: int.parse(readingPerRow!),
+                        zSilWidth: int.parse(silhouetteWidth!),
+                        silHeight: int.parse(silhouetteHeight!),
+                        targetDd: int.parse(targetDdTextController.text),
+                        targetSide: targetCdTextController.text == ""
+                            ? null
+                            : int.parse(targetCdTextController.text),
+                        varDd: int.parse(ddDeltaTextController.text),
+                        varCd: cdDeltaTextController.text == ""
+                            ? null
+                            : int.parse(cdDeltaTextController.text),
+                      );
 
-                    for (final value in values) {
-                      print("Configuration: ${value.id4}");
-                    }
+                      airstatSpaceDefinition
+                          .insertConfiguration(addAirstatSpaceDefinition);
+                      final List<Configuration> values =
+                          await airstatSpaceDefinition.getAllConfigurations();
 
-                    if (context.mounted) {
-                      informationSnackBar(context, Icons.check,
-                          "Space definition has been saved");
-                      boothSiteTextController.text = "";
-                      boothAreaTextController.text = "";
-                      boothFloorTextController.text = "";
-                      boothRoomTextController.text = "";
-                      unit = null;
-                      rows = null;
-                      readingPerRow = null;
-                      silhouetteWidth = null;
-                      silhouetteHeight = null;
-                      targetDdTextController.text = "";
-                      targetCdTextController.text = "";
-                      ddDeltaTextController.text = "";
-                      cdDeltaTextController.text = "";
+                      for (final value in values) {
+                        print("Configuration: ${value.id4}");
+                      }
 
-                      Navigator.pop(context);
+                      if (context.mounted) {
+                        informationSnackBar(context, Icons.check,
+                            "Space definition has been saved");
+                        boothSiteTextController.text = "";
+                        boothAreaTextController.text = "";
+                        boothFloorTextController.text = "";
+                        boothRoomTextController.text = "";
+                        unit = null;
+                        rows = null;
+                        readingPerRow = null;
+                        silhouetteWidth = null;
+                        silhouetteHeight = null;
+                        targetDdTextController.text = "";
+                        targetCdTextController.text = "";
+                        ddDeltaTextController.text = "";
+                        cdDeltaTextController.text = "";
+
+                        Navigator.pop(context);
+                      }
                     }
                   } else {
                     WidgetsBinding.instance.addPostFrameCallback((_) {

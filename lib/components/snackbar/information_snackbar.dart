@@ -38,10 +38,12 @@ void informationSnackBar(
       ),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
       ),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      elevation: 4,
+
+      backgroundColor:
+          Theme.of(context).colorScheme.primary, // Adjust the opacity here
+      elevation: 0, // Remove the shadow to make it fully transparent
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
     ),
   );

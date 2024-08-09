@@ -75,9 +75,9 @@ class BoothReadingDynamicTable extends ConsumerWidget {
                 return const SizedBox(width: 50); // Empty corner cell
               }
               return Container(
-                margin: const EdgeInsets.all(10),
-                width: 50,
-                height: 50,
+                margin: const EdgeInsets.all(5),
+                width: 80,
+                height: 30,
                 alignment: Alignment.center,
                 child: Text(
                   '$colIndex',
@@ -94,7 +94,7 @@ class BoothReadingDynamicTable extends ConsumerWidget {
                 // Y header column
                 Container(
                   width: 50,
-                  height: 50,
+                  height: 30,
                   margin: const EdgeInsets.all(5),
                   alignment: Alignment.center,
                   child: Text(
@@ -102,24 +102,27 @@ class BoothReadingDynamicTable extends ConsumerWidget {
                   ),
                 ),
                 // Data columns
-                ...List.generate(columns, (colIndex) {
-                  bool isSelected =
-                      rowIndex == selectedBox['selectedBox']['row'] &&
-                          colIndex == selectedBox['selectedBox']['col'];
-                  String value = ref
-                          .read(selectedBoothReadingBoxProvider.notifier)
-                          .getValue(rowIndex, colIndex) ??
-                      '';
-                  return BoxDataContainer(
-                    value: value,
-                    isSelected: isSelected,
-                    onTap: () {
-                      ref
-                          .read(selectedBoothReadingBoxProvider.notifier)
-                          .selectBox(rowIndex, colIndex);
-                    },
-                  );
-                }),
+                ...List.generate(
+                  columns,
+                  (colIndex) {
+                    bool isSelected =
+                        rowIndex == selectedBox['selectedBox']['row'] &&
+                            colIndex == selectedBox['selectedBox']['col'];
+                    String value = ref
+                            .read(selectedBoothReadingBoxProvider.notifier)
+                            .getValue(rowIndex, colIndex) ??
+                        '';
+                    return BoxDataContainer(
+                      value: value,
+                      isSelected: isSelected,
+                      onTap: () {
+                        ref
+                            .read(selectedBoothReadingBoxProvider.notifier)
+                            .selectBox(rowIndex, colIndex);
+                      },
+                    );
+                  },
+                ),
               ],
             );
           }),

@@ -9,51 +9,53 @@ import 'package:airstat/main/settings/settings.dart';
 import 'package:airstat/main/three_d_page.dart';
 import 'package:airstat/models/settings_model.dart';
 import 'package:airstat/provider/configure_files_provider.dart';
+import 'package:airstat/provider/ports_provider.dart';
 import 'package:airstat/services/airstat_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:usb_serial/usb_serial.dart';
 
 class Home extends HookConsumerWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final usbDevices = ref.watch(usbDevicesProvider);
-    // final subscription = ref.watch(subscriptionProvider);
-    // // Function to initialize USB devices
-    // void initializeUsbDevices() async {
-    //   // Add logic to fetch and set USB devices
-    //   // Example:
-    //   List<UsbDevice> serialList = await UsbSerial.listDevices();
+    final usbDevices = ref.watch(usbDevicesProvider);
+    final subscription = ref.watch(subscriptionProvider);
+    // Function to initialize USB devices
+    void initializeUsbDevices() async {
+      // Add logic to fetch and set USB devices
+      // Example:
+      List<UsbDevice> serialList = await UsbSerial.listDevices();
 
-    //   ref.read(usbDevicesProvider.notifier).state = serialList;
+      ref.read(usbDevicesProvider.notifier).state = serialList;
 
-    //   if (subscription != null) {
-    //     await ref.read(subscriptionProvider.notifier).state!.cancel();
-    //     ref.read(subscriptionProvider.notifier).state = null;
-    //   }
+      if (subscription != null) {
+        await ref.read(subscriptionProvider.notifier).state!.cancel();
+        ref.read(subscriptionProvider.notifier).state = null;
+      }
 
-    //   UsbPort port = (await serialList.first.create())!;
-    //   ref.read(usbPortProvider.notifier).state = port;
+      UsbPort port = (await serialList.first.create())!;
+      ref.read(usbPortProvider.notifier).state = port;
 
-    //   port.setDTR(true);
-    //   port.setRTS(true);
+      port.setDTR(true);
+      port.setRTS(true);
 
-    //   await port.setPortParameters(
-    //     9600, // Check the correct baud rate for WindSonic 75
-    //     UsbPort.DATABITS_8,
-    //     UsbPort.STOPBITS_1,
-    //     UsbPort.PARITY_NONE,
-    //   ); // Ensure these match your device's settings
-    // }
+      await port.setPortParameters(
+        9600, // Check the correct baud rate for WindSonic 75
+        UsbPort.DATABITS_8,
+        UsbPort.STOPBITS_1,
+        UsbPort.PARITY_NONE,
+      ); // Ensure these match your device's settings
+    }
 
-    // useEffect(() {
-    //   if (usbDevices.isEmpty) {
-    //     initializeUsbDevices();
-    //   }
-    //   return null;
-    // }, [usbDevices]);
+    useEffect(() {
+      if (usbDevices.isEmpty) {
+        initializeUsbDevices();
+      }
+      return null;
+    }, [usbDevices]);
 
     // Function to initialize USB devices
     void initializeSettings() async {
@@ -66,7 +68,12 @@ class Home extends HookConsumerWidget {
           data.delay.toString();
       ref.read(unitValueProvider.notifier).state = data.unit;
 
-      print("General Delay: ${ref.watch(generalDelayValueProvider)}");
+      ref.read(ventSamplingValueProvider.notifier).state =
+          data.ventSampling.toString();
+
+      ref.read(ventDelayValueProvider.notifier).state =
+          data.ventDelay.toString();
+      ref.read(userNameValueProvider.notifier).state = data.username;
     }
 
     useEffect(() {
@@ -176,7 +183,7 @@ class Home extends HookConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Settings(),
+                          builder: (context) => Settings(),
                         ),
                       );
                     },

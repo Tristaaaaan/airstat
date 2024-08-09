@@ -74,6 +74,67 @@ class SpaceDefinitionsDatabase {
     });
   }
 
+  Future<bool> checkConfigurationReadingModeSpecific(
+      String readingMode,
+      String id1,
+      String id2,
+      String id3,
+      String id4,
+      bool edit,
+      int? id) async {
+    final db = await spaceDefinitionDb;
+    if (edit) {
+      // Query the database with a WHERE clause to filter by readingMode
+      final List<Map<String, dynamic>> maps = await db.query(
+        'spaceDefinitions',
+        where: 'Mode = ?', // The WHERE clause
+        whereArgs: [readingMode], // The arguments for the WHERE clause
+      );
+
+      // Generate a list of Configuration objects from the query results
+      final List<Configuration> configurations =
+          List.generate(maps.length, (i) {
+        return Configuration.fromMap(maps[i]);
+      });
+
+      // Check if any configuration matches the provided id1, id2, id3, id4
+      for (var config in configurations) {
+        if (config.id1 == id1 &&
+            config.id2 == id2 &&
+            config.id3 == id3 &&
+            config.id4 == id4 &&
+            config.id != id) {
+          return true; // Return true if a match is found
+        }
+      }
+    } else {
+      // Query the database with a WHERE clause to filter by readingMode
+      final List<Map<String, dynamic>> maps = await db.query(
+        'spaceDefinitions',
+        where: 'Mode = ?', // The WHERE clause
+        whereArgs: [readingMode], // The arguments for the WHERE clause
+      );
+
+      // Generate a list of Configuration objects from the query results
+      final List<Configuration> configurations =
+          List.generate(maps.length, (i) {
+        return Configuration.fromMap(maps[i]);
+      });
+
+      // Check if any configuration matches the provided id1, id2, id3, id4
+      for (var config in configurations) {
+        if (config.id1 == id1 &&
+            config.id2 == id2 &&
+            config.id3 == id3 &&
+            config.id4 == id4) {
+          return true; // Return true if a match is found
+        }
+      }
+    }
+
+    return false; // Return false if no match is found
+  }
+
   Future<Configuration?> getConfiguration(Configuration config) async {
     final db = await spaceDefinitionDb;
     final List<Map<String, dynamic>> maps = await db.query(
