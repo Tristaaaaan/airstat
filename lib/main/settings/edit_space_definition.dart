@@ -586,66 +586,70 @@ class EditSpaceDefinition extends ConsumerWidget {
                       silhouetteHeight != null &&
                       targetDdTextController.text.isNotEmpty &&
                       ddDeltaTextController.text.isNotEmpty) {
-                    print("Site: ${boothSiteTextController.text}");
-                    print("Shop/Area: ${boothAreaTextController.text}");
-                    print("Line/Floor: ${boothFloorTextController.text}");
-                    print("Zone/Room: ${boothRoomTextController.text}");
-                    print("Unit: $unit");
-                    print("Rows: $rows");
-                    print("Reading Per Row: $readingPerRow");
-                    print("Silhouette Width: $silhouetteWidth");
-                    print("Silhouette Height: $silhouetteHeight");
-                    print("Target DD: ${targetDdTextController.text}");
-                    print("Target CD: ${targetCdTextController.text}");
-                    print("DD Delta: ${ddDeltaTextController.text}");
-                    print("CD Delta: ${cdDeltaTextController.text}");
-
-                    Configuration updateSpaceDefinition = Configuration(
-                      id: config.id,
-                      id1: boothSiteTextController.text,
-                      id2: boothAreaTextController.text,
-                      id3: boothFloorTextController.text,
-                      id4: boothRoomTextController.text,
-                      units: unit!,
-                      mode: config.mode,
-                      xRows: int.parse(rows!),
-                      yReadPerRow: int.parse(readingPerRow!),
-                      zSilWidth: int.parse(silhouetteWidth!),
-                      silHeight: int.parse(silhouetteHeight!),
-                      targetDd: int.parse(targetDdTextController.text),
-                      targetSide: targetCdTextController.text == ""
-                          ? null
-                          : int.parse(targetCdTextController.text),
-                      varDd: int.parse(ddDeltaTextController.text),
-                      varCd: cdDeltaTextController.text == ""
-                          ? null
-                          : int.parse(cdDeltaTextController.text),
+                    final checkIds = await airstatSpaceDefinition
+                        .checkConfigurationReadingModeSpecific(
+                      config.mode,
+                      boothSiteTextController.text,
+                      boothAreaTextController.text,
+                      boothFloorTextController.text,
+                      boothRoomTextController.text,
+                      true,
+                      config.id,
                     );
+                    if (checkIds) {
+                      if (context.mounted) {
+                        informationSnackBar(context, Icons.warning,
+                            "The configuration you entered already exist.");
+                      }
+                      return;
+                    } else {
+                      Configuration updateSpaceDefinition = Configuration(
+                        id: config.id,
+                        id1: boothSiteTextController.text,
+                        id2: boothAreaTextController.text,
+                        id3: boothFloorTextController.text,
+                        id4: boothRoomTextController.text,
+                        units: unit!,
+                        mode: config.mode,
+                        xRows: int.parse(rows!),
+                        yReadPerRow: int.parse(readingPerRow!),
+                        zSilWidth: int.parse(silhouetteWidth!),
+                        silHeight: int.parse(silhouetteHeight!),
+                        targetDd: int.parse(targetDdTextController.text),
+                        targetSide: targetCdTextController.text == ""
+                            ? null
+                            : int.parse(targetCdTextController.text),
+                        varDd: int.parse(ddDeltaTextController.text),
+                        varCd: cdDeltaTextController.text == ""
+                            ? null
+                            : int.parse(cdDeltaTextController.text),
+                      );
 
-                    final int values = await airstatSpaceDefinition
-                        .updateConfiguration(updateSpaceDefinition);
+                      final int values = await airstatSpaceDefinition
+                          .updateConfiguration(updateSpaceDefinition);
 
-                    print("Updated $values rows");
+                      print("Updated $values rows");
 
-                    if (context.mounted) {
-                      selectedItems.clearSelection();
-                      informationSnackBar(context, Icons.check,
-                          "Space definition has been saved");
-                      boothSiteTextController.text = "";
-                      boothAreaTextController.text = "";
-                      boothFloorTextController.text = "";
-                      boothRoomTextController.text = "";
-                      unit = null;
-                      rows = null;
-                      readingPerRow = null;
-                      silhouetteWidth = null;
-                      silhouetteHeight = null;
-                      targetDdTextController.text = "";
-                      targetCdTextController.text = "";
-                      ddDeltaTextController.text = "";
-                      cdDeltaTextController.text = "";
+                      if (context.mounted) {
+                        selectedItems.clearSelection();
+                        informationSnackBar(context, Icons.check,
+                            "Space definition has been saved");
+                        boothSiteTextController.text = "";
+                        boothAreaTextController.text = "";
+                        boothFloorTextController.text = "";
+                        boothRoomTextController.text = "";
+                        unit = null;
+                        rows = null;
+                        readingPerRow = null;
+                        silhouetteWidth = null;
+                        silhouetteHeight = null;
+                        targetDdTextController.text = "";
+                        targetCdTextController.text = "";
+                        ddDeltaTextController.text = "";
+                        cdDeltaTextController.text = "";
 
-                      Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      }
                     }
                   } else {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
