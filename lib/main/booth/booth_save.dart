@@ -129,6 +129,7 @@ class BoothSaveData extends ConsumerWidget {
                         ref.watch(boothCdDeltaProvider) == 'null'
                             ? '--.-'
                             : ref.watch(boothCdDeltaProvider),
+                        ref.watch(userNameValueProvider),
                       );
 
                       // Refresh the file list after saving the new file

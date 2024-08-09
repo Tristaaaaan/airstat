@@ -66,7 +66,12 @@ class Home extends HookConsumerWidget {
           data.delay.toString();
       ref.read(unitValueProvider.notifier).state = data.unit;
 
-      print("General Delay: ${ref.watch(generalDelayValueProvider)}");
+      ref.read(ventSamplingValueProvider.notifier).state =
+          data.ventSampling.toString();
+
+      ref.read(ventDelayValueProvider.notifier).state =
+          data.ventDelay.toString();
+      ref.read(userNameValueProvider.notifier).state = data.username;
     }
 
     useEffect(() {
@@ -176,7 +181,7 @@ class Home extends HookConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Settings(),
+                          builder: (context) => Settings(),
                         ),
                       );
                     },

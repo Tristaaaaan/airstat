@@ -36,12 +36,15 @@ class AirstatSettingsConfiguration {
 
   Future<void> createAirstatSettingsTable(Database database) async {
     await database.execute(
-        'CREATE TABLE IF NOT EXISTS settings (delay INTEGER, sampling INTEGER, unit TEXT)');
+        'CREATE TABLE IF NOT EXISTS settings (delay INTEGER, sampling INTEGER, unit TEXT, username TEXT, vent_delay INTEGER, vent_sampling INTEGER)');
 
     await database.insert('settings', {
-      'delay': 5,
       'sampling': 10,
-      'unit': 'f/min',
+      'vent_sampling': 10,
+      'delay': 5,
+      'vent_delay': 5,
+      'unit': 'ft/min',
+      'username': 'DefaultUser1',
     });
   }
 
@@ -67,7 +70,14 @@ class AirstatSettingsConfiguration {
     if (maps.isNotEmpty) {
       return AirstatSettingsModel.fromMap(maps.first);
     } else {
-      return AirstatSettingsModel(delay: 5, sampling: 10, unit: 'f/min');
+      return AirstatSettingsModel(
+        delay: 5,
+        sampling: 10,
+        unit: 'f/min',
+        ventDelay: 5,
+        ventSampling: 10,
+        username: 'DefaultUser1',
+      );
     }
   }
 
